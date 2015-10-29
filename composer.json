@@ -1,0 +1,5 @@
+{
+    "require": {
+        "josegonzalez/dotenv": "^1.0"
+    }
+}
