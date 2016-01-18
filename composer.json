@@ -23,6 +23,9 @@
         "composer-plugin-api": "^1.0",
         "vlucas/phpdotenv": "^2.0.1"
     },
+    "require-dev": {
+        "composer/composer": "@dev"
+    },
     "extra": {
         "class": "Helhum\\DotEnvConnector\\Plugin",
         "branch-alias": {
