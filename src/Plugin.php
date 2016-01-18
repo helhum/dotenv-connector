@@ -110,14 +110,14 @@ EOF;
         $this->io->write('<info>Inserting dotenv initialization into main autoload file</info>');
 
         $originalAutoloadFileContent = file_get_contents($autoloadFile);
-        preg_match('/\nreturn ([^;]+;\s*$)/mD', $originalAutoloadFileContent, $matches);
-        if (empty($matches[1])) {
+        preg_match('/ComposerAutoloaderInit[^;]*;/', $originalAutoloadFileContent, $matches);
+        if (empty($matches[0])) {
             throw new \RuntimeException(
                 'Could not adjust autoloader: autoload.php could not be parsed!',
                 1453127591
             );
         }
-        $code = $matches[1] . "\n" . $code;
+        $code = $matches[0] . "\n" . $code;
         // Regex modifiers:
         // "m": \s matches newlines
         // "D": $ matches at EOF only
