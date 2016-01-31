@@ -2,7 +2,7 @@
 namespace Helhum\DotEnvConnector;
 
 /*
- * This file is part of the class alias loader package.
+ * This file is part of the dotenv connector package.
  *
  * (c) Helmut Hummel <info@helhum.io>
  *
@@ -11,7 +11,6 @@ namespace Helhum\DotEnvConnector;
  */
 
 use Composer\Composer;
-use Composer\Config;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
@@ -23,6 +22,10 @@ use Composer\Util\Filesystem;
  */
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
+    const RESOURCES_PATH = '/res/PHP';
+    const INCLUDE_FILE = '/dotenv-include.php';
+    const INCLUDE_FILE_TEMPLATE = '/dotenv-include.tmpl';
+
     /**
      * @var Composer
      */
@@ -34,9 +37,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     protected $io;
 
     /**
-     * @var string
+     * @var Config
      */
-    protected $baseDir;
+    protected $config;
 
     /**
      * Apply plugin modifications to composer
@@ -46,15 +49,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function activate(Composer $composer, IOInterface $io)
     {
+        $this->config = Config::load($io, $composer->getConfig());
         $this->composer = $composer;
         $this->io = $io;
-        $this->baseDir = substr($this->composer->getConfig()->get('vendor-dir'), 0, -strlen($this->composer->getConfig()->get('vendor-dir', Config::RELATIVE_PATHS)));
     }
 
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return array(
             ScriptEvents::POST_AUTOLOAD_DUMP => array('onPostAutoloadDump')
         );
@@ -68,80 +72,44 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPostAutoloadDump(\Composer\Script\Event $event)
     {
-        if (!file_exists($this->baseDir . '.env')) {
+        if (!file_exists($this->config->getBaseDir() . '/.env')) {
             return;
         }
 
-        if ($event->isDevMode()) {
-            $filesystem = new Filesystem();
-            $pathToRootCode = $filesystem->findShortestPathCode($this->composer->getConfig()->get('vendor-dir') . '/foo', $this->baseDir);
-            $envCode = <<<EOF
-\$dec = new \\Dotenv\\Dotenv($pathToRootCode);
-\$dec->overload();
-unset(\$dec);
-EOF;
+        $filesystem = new Filesystem();
+        $resourcesPath = realpath(__DIR__ . '/../' . self::RESOURCES_PATH);
+        $includeFile = $resourcesPath . '/' . self::INCLUDE_FILE;
+        $includeFileTemplate = realpath($resourcesPath . '/' . self::INCLUDE_FILE_TEMPLATE);
+        $pathToEnvFileCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate), $this->config->get('env-dir'), true);
+        $cacheDir = $this->config->get('cache-dir');
+        $allowOverridesCode = $this->config->get('allow-overrides') ? 'true' : 'false';
+        if (($event->isDevMode() && !$this->config->get('cache-in-dev-mode'))
+            || empty($cacheDir)
+            || $cacheDir === $this->config->getBaseDir()
+        ) {
+            $pathToCacheDirCode = '\'\'';
         } else {
-            $envCode = $this->getCachedCode($this->baseDir);
+            $pathToCacheDirCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate), $cacheDir, true);
         }
-        $code = <<<EOF
-// start insert by helhum/dotenv-connector
-$envCode
-// end by helhum/dotenv-connector
-EOF;
-        $this->insertCode("\n" . $code . "\n\n");
+        $includeFileContent = file_get_contents($includeFileTemplate);
+        $includeFileContent = $this->replaceToken('env-dir', $pathToEnvFileCode, $includeFileContent);
+        $includeFileContent = $this->replaceToken('allow-overrides', $allowOverridesCode, $includeFileContent);
+        $includeFileContent = $this->replaceToken('cache-dir', $pathToCacheDirCode, $includeFileContent);
+
+        file_put_contents($includeFile, $includeFileContent);
     }
 
     /**
-     * @param string $code
-     */
-    protected function insertCode($code) {
-        $composerConfig = $this->composer->getConfig();
-        $vendorDir = $composerConfig->get('vendor-dir');
-        $autoloadFile = $vendorDir . '/autoload.php';
-        if (!file_exists($autoloadFile)) {
-            throw new \RuntimeException(sprintf(
-                'Could not adjust autoloader: The file %s was not found.',
-                $autoloadFile
-            ),
-            1453127591
-            );
-        }
-
-        $this->io->write('<info>Inserting dotenv initialization into main autoload file</info>');
-
-        $originalAutoloadFileContent = file_get_contents($autoloadFile);
-        preg_match('/ComposerAutoloaderInit[^;]*;/', $originalAutoloadFileContent, $matches);
-        if (empty($matches[0])) {
-            throw new \RuntimeException(
-                'Could not adjust autoloader: autoload.php could not be parsed!',
-                1453127591
-            );
-        }
-        $code = $matches[0] . "\n" . $code;
-        // Regex modifiers:
-        // "m": \s matches newlines
-        // "D": $ matches at EOF only
-        // Translation: insert before the last "return" in the file
-        $contents = preg_replace('/\n(?=return [^;]+;\s*$)/mD', "\n" . $code, $originalAutoloadFileContent);
-        file_put_contents($autoloadFile, $contents);
-    }
-
-    /**
-     * @param string $envFileDir
+     * Replaces a token in the subject (PHP code)
+     *
+     * @param string $name
+     * @param string $content
+     * @param string $subject
      * @return string
      */
-    protected function getCachedCode($envFileDir)
+    protected function replaceToken($name, $content, $subject)
     {
-        $superGlobalEnvBackup = $_ENV;
-        $dotEnv = new \Dotenv\Dotenv($envFileDir);
-        $dotEnv->overload();
-        $writtenEnvVars = array_diff_assoc($_ENV, $superGlobalEnvBackup);
-        $cacheFileContent = "\n";
-        foreach ($writtenEnvVars as $name => $value) {
-            $cacheFileContent .= "putenv('$name=$value');\n";
-            $cacheFileContent .= "\$_ENV['$name'] = '$value';\n";
-            $cacheFileContent .= "\$_SERVER['$name'] = '$value';\n";
-        }
-        return $cacheFileContent;
+        $subject = str_replace('{$' . $name . '}', $content, $subject);
+        return $subject;
     }
 }

@@ -1,0 +1,4 @@
+<?php
+$dotEnvReader = new \Helhum\DotEnvConnector\DotEnvReader({$env-dir}, {$allow-overrides}, {$cache-dir});
+$dotEnvReader->read();
+unset($dotEnvReader);
