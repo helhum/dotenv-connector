@@ -10,19 +10,14 @@ namespace Helhum\DotEnvConnector;
  * file that was distributed with this source code.
  */
 
+use Dotenv\Dotenv;
+
 /**
  * Class DotEnvReader
  */
 class DotEnvReader
 {
     const CACHE_FILE = '/dotenv-cache.php';
-
-    /**
-     * Absolute path to the .env file
-     *
-     * @var string
-     */
-    protected $dotEnvPath;
 
     /**
      * Absolute path to a (writable) cache directory (or empty for disabled cache)
@@ -39,15 +34,22 @@ class DotEnvReader
     protected $allowOverloading = true;
 
     /**
+     * The .env parser/loader
+     *
+     * @var Dotenv
+     */
+    protected $dotEnv;
+
+    /**
      * DotEnvReader constructor.
      *
-     * @param string $dotEnvPath
-     * @param bool $allowOverloading
-     * @param string $cacheDirectory
+     * @param Dotenv $dotEnv The .env parser/loader
+     * @param bool $allowOverloading Whether or not existing environment vars should be overridden by .env
+     * @param string $cacheDirectory Writable directory to store the cache file
      */
-    public function __construct($dotEnvPath, $allowOverloading = true, $cacheDirectory = '')
+    public function __construct(Dotenv $dotEnv, $allowOverloading = true, $cacheDirectory = '')
     {
-        $this->dotEnvPath = $dotEnvPath;
+        $this->dotEnv = $dotEnv;
         $this->allowOverloading = $allowOverloading;
         $this->cacheDirectory = $cacheDirectory;
     }
@@ -82,11 +84,10 @@ class DotEnvReader
      */
     protected function parseEnvironmentVariables()
     {
-        $dotEnvConnector = new \Dotenv\Dotenv($this->dotEnvPath);
         if ($this->allowOverloading) {
-            $dotEnvConnector->overload();
+            $this->dotEnv->overload();
         } else {
-            $dotEnvConnector->load();
+            $this->dotEnv->load();
         }
     }
 
