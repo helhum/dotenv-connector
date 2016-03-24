@@ -90,6 +90,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             $pathToCacheDirCode = '\'\'';
         } else {
             $pathToCacheDirCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate), $cacheDir, true);
+            if (file_exists($cacheDir . DotEnvReader::CACHE_FILE)) {
+                @unlink($cacheDir . DotEnvReader::CACHE_FILE);
+            }
         }
         $includeFileContent = file_get_contents($includeFileTemplate);
         $includeFileContent = $this->replaceToken('env-dir', $pathToEnvFileCode, $includeFileContent);
