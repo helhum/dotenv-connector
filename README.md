@@ -34,21 +34,31 @@ You configure dotenv connector in the extra section of the root `composer.json` 
     }
 ```
 
-### `env-dir`
+#### `env-dir`
 You can specify a relative path from the base directory, if you want to put your `.env` file a different location.
+
 *The default value* is "", which means next to your next to your root `composer.json`.
 
-### `allow-overrides`
+#### `allow-overrides`
 If `true` it means that already present environment variables are allowed to be overridden by values in your `.env`.
 Set this to `false` if you want to be able to override application behavior without modifying the `.env`
+
 *The default value* is `true`
 
-### `cache-dir' 
+#### `cache-dir`
 If you want to make use of the caching feature of this plugin, you must set this value to a valid (and writable) path.
 The cache file is written during application runtime (when composer class loader is initialized), **not** during `composer intall`
+
 *The default value* is "" which means no caching is done at all.
 
-### `cache-in-dev-mode`
+#### `cache-in-dev-mode`
 By default the caching feature is also disable, when your application is installed via composer in dev mode (`--no-dev` is not provided).
 This behavior is useful, to be able to easily change `.env` during development, but benefit from caching after deployment.
+
 *The default value* is `false`. Leave it like that unless you need extra 3% more speed for your requests during development.
+
+## Feedback
+
+Any feedback is appreciated. Please write bug reports, feature request, create pull requests, or just drop me a "thank you" via [Twitter](https://twitter.com/helhum) or spread the word.
+
+Thank you!
