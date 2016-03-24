@@ -2,7 +2,7 @@
     "name": "helhum/dotenv-connector",
     "type": "composer-plugin",
     "license": "MIT",
-    "description": "Makes it possible to set environment variables for composer projects using dotenv",
+    "description": "Makes it possible to set environment variables for composer projects.",
     "keywords": [
         "composer", "env", "12factor", "dotenv"
     ],
