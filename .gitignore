@@ -1,2 +1,3 @@
 vendor
 composer.lock
+/res/PHP/dotenv-include.php

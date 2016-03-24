@@ -72,21 +72,29 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPostAutoloadDump(\Composer\Script\Event $event)
     {
-        if (!file_exists($this->config->getBaseDir() . '/.env')) {
-            return;
-        }
+        $includeFile = $this->getResourcesPath() . '/' . self::INCLUDE_FILE;
+        $includeFileContent = $this->getIncludeFileContent($event);
+        file_put_contents($includeFile, $includeFileContent);
+    }
 
+    /**
+     * Constructs the include file content
+     *
+     * @param \Composer\Script\Event $event
+     * @return array
+     */
+    protected function getIncludeFileContent(\Composer\Script\Event $event)
+    {
+        if (!file_exists($this->config->get('env-dir') . '/.env')) {
+            return '';
+        }
         $filesystem = new Filesystem();
-        $resourcesPath = realpath(__DIR__ . '/../' . self::RESOURCES_PATH);
-        $includeFile = $resourcesPath . '/' . self::INCLUDE_FILE;
-        $includeFileTemplate = realpath($resourcesPath . '/' . self::INCLUDE_FILE_TEMPLATE);
-        $pathToEnvFileCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate), $this->config->get('env-dir'), true);
+        $includeFileTemplate = realpath($this->getResourcesPath() . '/' . self::INCLUDE_FILE_TEMPLATE);
+        $pathToEnvFileCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate),
+            $this->config->get('env-dir'), true);
         $cacheDir = $this->config->get('cache-dir');
         $allowOverridesCode = $this->config->get('allow-overrides') ? 'true' : 'false';
-        if (($event->isDevMode() && !$this->config->get('cache-in-dev-mode'))
-            || empty($cacheDir)
-            || $cacheDir === $this->config->getBaseDir()
-        ) {
+        if (($event->isDevMode() && !$this->config->get('cache-in-dev-mode')) || empty($cacheDir) || $cacheDir === $this->config->getBaseDir()) {
             $pathToCacheDirCode = '\'\'';
         } else {
             $pathToCacheDirCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate), $cacheDir, true);
@@ -99,7 +107,17 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $includeFileContent = $this->replaceToken('allow-overrides', $allowOverridesCode, $includeFileContent);
         $includeFileContent = $this->replaceToken('cache-dir', $pathToCacheDirCode, $includeFileContent);
 
-        file_put_contents($includeFile, $includeFileContent);
+        return $includeFileContent;
+    }
+
+    /**
+     * Just returns the resources path
+     *
+     * @return string
+     */
+    protected function getResourcesPath()
+    {
+        return realpath(__DIR__ . '/../' . self::RESOURCES_PATH);
     }
 
     /**
