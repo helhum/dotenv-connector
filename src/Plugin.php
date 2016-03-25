@@ -85,9 +85,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     protected function getIncludeFileContent(\Composer\Script\Event $event)
     {
-        if (!file_exists($this->config->get('env-dir') . '/.env')) {
-            return '';
-        }
         $filesystem = new Filesystem();
         $includeFileTemplate = realpath($this->getResourcesPath() . '/' . self::INCLUDE_FILE_TEMPLATE);
         $pathToEnvFileCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate),
