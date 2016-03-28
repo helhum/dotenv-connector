@@ -87,8 +87,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     {
         $filesystem = new Filesystem();
         $includeFileTemplate = realpath($this->getResourcesPath() . '/' . self::INCLUDE_FILE_TEMPLATE);
-        $pathToEnvFileCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate),
-            $this->config->get('env-dir'), true);
+        $pathToEnvFileCode = $filesystem->findShortestPathCode(
+            dirname($includeFileTemplate),
+            $this->config->get('env-dir'),
+            true
+        );
         $cacheDir = $this->config->get('cache-dir');
         $allowOverridesCode = $this->config->get('allow-overrides') ? 'true' : 'false';
         if (($event->isDevMode() && !$this->config->get('cache-in-dev-mode')) || empty($cacheDir) || $cacheDir === $this->config->getBaseDir()) {
