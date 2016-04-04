@@ -60,7 +60,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            ScriptEvents::POST_AUTOLOAD_DUMP => array('onPostAutoloadDump')
+            ScriptEvents::PRE_AUTOLOAD_DUMP => array('onPreAutoloadDump')
         );
     }
 
@@ -70,7 +70,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * @param \Composer\Script\Event $event
      * @return bool
      */
-    public function onPostAutoloadDump(\Composer\Script\Event $event)
+    public function onPreAutoloadDump(\Composer\Script\Event $event)
     {
         $includeFile = $this->getResourcesPath() . '/' . self::INCLUDE_FILE;
         $includeFileContent = $this->getIncludeFileContent($event);
