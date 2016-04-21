@@ -1,4 +1,4 @@
-# dotenv connector
+# dotenv connector [![Build Status](https://travis-ci.org/helhum/dotenv-connector.svg?branch=master)](https://travis-ci.org/helhum/dotenv-connector)
 
 This is a composer plugin, that makes environment
 variables easily available for any composer based project,
