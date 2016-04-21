@@ -10,8 +10,7 @@
  * http://www.gnu.org/copyleft/gpl.html.
  *
  */
-
-namespace Helhum\DotEnvConnector\Tests\Unit;
+namespace Helhum\DotEnvConnector\tests\Unit;
 
 /*
  * This file is part of the dotenv connector package.
@@ -30,8 +29,8 @@ use Helhum\DotEnvConnector\DotEnvReader;
  */
 class DotEnvReaderTest extends \PHPUnit_Framework_TestCase
 {
-
-    protected function tearDown() {
+    protected function tearDown()
+    {
         // Cleanup single env var used
         putenv('FOO');
     }

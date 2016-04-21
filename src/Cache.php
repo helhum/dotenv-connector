@@ -1,7 +1,7 @@
 <?php
 namespace Helhum\DotEnvConnector;
 
-    /*
+/*
  * This file is part of the dotenv connector package.
  *
  * (c) Helmut Hummel <info@helhum.io>

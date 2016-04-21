@@ -22,8 +22,7 @@
  * http://www.gnu.org/copyleft/gpl.html.
  *
  */
-
-namespace Helhum\DotEnvConnector\Tests\Unit;
+namespace Helhum\DotEnvConnector\tests\Unit;
 
 /*
  * This file is part of the dotenv connector package.
@@ -47,7 +46,6 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         foreach (glob($cacheDir . '/*.php') as $file) {
             unlink($file);
         };
-
     }
 
     /**
