@@ -26,6 +26,9 @@ before_install:
   - composer self-update
   - composer --version
 
+before_script:
+  - composer install
+
 script:
   - >
     echo;
