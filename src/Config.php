@@ -23,7 +23,6 @@ class Config
     public static $defaultConfig = array(
         'env-dir' => '',
         'cache-dir' => '',
-        'cache-in-dev-mode' => false,
         'allow-overrides' => true,
     );
 

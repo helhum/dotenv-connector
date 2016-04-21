@@ -94,13 +94,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         );
         $cacheDir = $this->config->get('cache-dir');
         $allowOverridesCode = $this->config->get('allow-overrides') ? 'true' : 'false';
-        if (($event->isDevMode() && !$this->config->get('cache-in-dev-mode')) || empty($cacheDir) || $cacheDir === $this->config->getBaseDir()) {
+        if (empty($cacheDir) || $cacheDir === $this->config->getBaseDir()) {
             $pathToCacheDirCode = '\'\'';
         } else {
+            $cache = new Cache($cacheDir, $this->config->get('env-dir'));
+            $cache->cleanCache();
             $pathToCacheDirCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate), $cacheDir, true);
-            if (file_exists($cacheDir . DotEnvReader::CACHE_FILE)) {
-                @unlink($cacheDir . DotEnvReader::CACHE_FILE);
-            }
         }
         $includeFileContent = file_get_contents($includeFileTemplate);
         $includeFileContent = $this->replaceToken('env-dir', $pathToEnvFileCode, $includeFileContent);

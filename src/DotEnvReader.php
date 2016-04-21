@@ -17,14 +17,10 @@ use Dotenv\Dotenv;
  */
 class DotEnvReader
 {
-    const CACHE_FILE = '/dotenv-cache.php';
-
     /**
-     * Absolute path to a (writable) cache directory (or empty for disabled cache)
-     *
-     * @var string
+     * @var Cache
      */
-    protected $cacheDirectory;
+    protected $cache;
 
     /**
      * Whether or not it is allowed to override existing environment vars
@@ -44,14 +40,14 @@ class DotEnvReader
      * DotEnvReader constructor.
      *
      * @param Dotenv $dotEnv The .env parser/loader
+     * @param Cache $cache Cache handler
      * @param bool $allowOverloading Whether or not existing environment vars should be overridden by .env
-     * @param string $cacheDirectory Writable directory to store the cache file
      */
-    public function __construct(Dotenv $dotEnv, $allowOverloading = true, $cacheDirectory = '')
+    public function __construct(Dotenv $dotEnv, Cache $cache, $allowOverloading = false)
     {
         $this->dotEnv = $dotEnv;
+        $this->cache = $cache;
         $this->allowOverloading = $allowOverloading;
-        $this->cacheDirectory = $cacheDirectory;
     }
 
     /**
@@ -59,24 +55,18 @@ class DotEnvReader
      */
     public function read()
     {
-        if (!empty($this->cacheDirectory)
-            && @file_exists($this->cacheDirectory . self::CACHE_FILE)
-        ) {
-            require $this->cacheDirectory . self::CACHE_FILE;
-            return;
-        }
-        if (!empty($this->cacheDirectory)
-            && is_dir($this->cacheDirectory)
-            && is_writable($this->cacheDirectory)
-        ) {
-            $superGlobalEnvBackup = $_ENV;
-            $this->parseEnvironmentVariables();
-            $writtenEnvVars = array_diff_assoc($_ENV, $superGlobalEnvBackup);
-            file_put_contents($this->cacheDirectory . self::CACHE_FILE, $this->getCachedCode($writtenEnvVars));
+        if ($this->cache->isEnabled()) {
+            if ($this->cache->hasCache()) {
+                $this->cache->loadCache();
+            } else {
+                $superGlobalEnvBackup = $_ENV;
+                $this->parseEnvironmentVariables();
+                $writtenEnvVars = array_diff_assoc($_ENV, $superGlobalEnvBackup);
+                $this->cache->storeCache($this->getCachedCode($writtenEnvVars));
+            }
         } else {
             $this->parseEnvironmentVariables();
         }
-        return;
     }
 
     /**

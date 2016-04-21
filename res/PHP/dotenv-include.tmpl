@@ -1,7 +1,7 @@
 <?php
 $dotEnvDir = {$env-dir};
 if (file_exists($dotEnvDir . '/.env')) {
-    $dotEnvReader = new \Helhum\DotEnvConnector\DotEnvReader(new \Dotenv\Dotenv($dotEnvDir), {$allow-overrides}, {$cache-dir});
+    $dotEnvReader = new \Helhum\DotEnvConnector\DotEnvReader(new \Dotenv\Dotenv($dotEnvDir), new \Helhum\DotEnvConnector\Cache({$cache-dir}, $dotEnvDir), {$allow-overrides});
     $dotEnvReader->read();
     unset($dotEnvReader);
 }

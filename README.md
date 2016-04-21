@@ -51,12 +51,6 @@ The cache file is written during application runtime (when composer class loader
 
 *The default value* is "" which means no caching is done at all.
 
-#### `cache-in-dev-mode`
-By default the caching feature is also disable, when your application is installed via composer in dev mode (`--no-dev` is not provided).
-This behavior is useful, to be able to easily change `.env` during development, but benefit from caching after deployment.
-
-*The default value* is `false`. Leave it like that unless you need extra 3% more speed for your requests during development.
-
 ## Feedback
 
 Any feedback is appreciated. Please write bug reports, feature request, create pull requests, or just drop me a "thank you" via [Twitter](https://twitter.com/helhum) or spread the word.
