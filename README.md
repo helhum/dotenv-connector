@@ -28,8 +28,7 @@ You configure dotenv connector in the extra section of the root `composer.json` 
       "helhum/dotenv-connector": {
           "env-dir": "",
           "allow-overrides": true,
-          "cache-dir": "var/cache",
-          "cache-in-dev-mode": false
+          "cache-dir": "var/cache"
       }
     }
 ```
