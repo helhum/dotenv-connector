@@ -1,0 +1,37 @@
+language: php
+
+php:
+  - 5.3
+  - 5.4
+  - 5.5
+  - 5.6
+  - 7
+
+addons:
+  apt:
+    packages:
+      - parallel
+
+sudo: false
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+notifications:
+  email:
+    - typo3@helhum.io
+
+before_install:
+  - phpenv config-rm xdebug.ini
+  - composer self-update
+  - composer --version
+
+script:
+  - >
+    echo;
+    echo "Running unit tests";
+    vendor/bin/phpunit tests/Unit/
+  - >
+    echo;
+    echo "Running php lint";
+    find . -name \*.php ! -path "./vendor/*" | parallel --gnu php -d display_errors=stderr -l {} > /dev/null \;
