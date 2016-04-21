@@ -67,23 +67,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Plugin callback for this script event, which calls the previously implemented static method
      *
-     * @param \Composer\Script\Event $event
      * @return bool
      */
-    public function onPreAutoloadDump(\Composer\Script\Event $event)
+    public function onPreAutoloadDump()
     {
         $includeFile = $this->getResourcesPath() . '/' . self::INCLUDE_FILE;
-        $includeFileContent = $this->getIncludeFileContent($event);
+        $includeFileContent = $this->getIncludeFileContent();
         file_put_contents($includeFile, $includeFileContent);
     }
 
     /**
      * Constructs the include file content
      *
-     * @param \Composer\Script\Event $event
      * @return array
      */
-    protected function getIncludeFileContent(\Composer\Script\Event $event)
+    protected function getIncludeFileContent()
     {
         $filesystem = new Filesystem();
         $includeFileTemplate = realpath($this->getResourcesPath() . '/' . self::INCLUDE_FILE_TEMPLATE);
