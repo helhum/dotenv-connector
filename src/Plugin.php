@@ -23,9 +23,15 @@ use Composer\Util\Filesystem;
  */
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
-    const RESOURCES_PATH = '/res/PHP';
-    const INCLUDE_FILE = '/dotenv-include.php';
-    const INCLUDE_FILE_TEMPLATE = '/dotenv-include.tmpl';
+    /**
+     * Path to include file relative to vendor dir
+     */
+    const INCLUDE_FILE = '/helhum/dotenv-include.php';
+
+    /**
+     * Path to include file template relative to package dir
+     */
+    const INCLUDE_FILE_TEMPLATE = '/res/PHP/dotenv-include.tmpl';
 
     /**
      * @var IOInterface
@@ -68,12 +74,20 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public static function onPreAutoloadDump(Event $event)
     {
+        $composerConfig = $event->getComposer()->getConfig();
         if (self::$config === null) {
-            self::$config = Config::load($event->getIO(), $event->getComposer()->getConfig());
+            self::$config = Config::load($event->getIO(), $composerConfig);
         }
-        $includeFile = self::getResourcesPath() . '/' . self::INCLUDE_FILE;
+        $includeFile = $composerConfig->get('vendor-dir') . self::INCLUDE_FILE;
+        $fs = new Filesystem();
+        $fs->ensureDirectoryExists(dirname($includeFile));
         $includeFileContent = self::getIncludeFileContent();
         file_put_contents($includeFile, $includeFileContent);
+
+        $composer = $event->getComposer();
+        $autoload = $composer->getPackage()->getAutoload();
+        $autoload['files'][] = $includeFile;
+        $composer->getPackage()->setAutoload($autoload);
     }
 
     /**
@@ -86,7 +100,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     protected static function getIncludeFileContent()
     {
         $filesystem = new Filesystem();
-        $includeFileTemplate = realpath(self::getResourcesPath() . '/' . self::INCLUDE_FILE_TEMPLATE);
+        $includeFileTemplate = realpath(dirname(__DIR__) . self::INCLUDE_FILE_TEMPLATE);
         $pathToEnvFileCode = $filesystem->findShortestPathCode(
             dirname($includeFileTemplate),
             self::$config->get('env-dir'),
@@ -107,16 +121,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $includeFileContent = self::replaceToken('cache-dir', $pathToCacheDirCode, $includeFileContent);
 
         return $includeFileContent;
-    }
-
-    /**
-     * Just returns the resources path
-     *
-     * @return string
-     */
-    protected static function getResourcesPath()
-    {
-        return realpath(dirname(__DIR__) . self::RESOURCES_PATH);
     }
 
     /**

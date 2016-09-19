@@ -16,8 +16,7 @@
     "autoload": {
         "psr-4": {
             "Helhum\\DotEnvConnector\\": "src/"
-        },
-        "files": ["res/PHP/dotenv-include.php"]
+        }
     },
     "require": {
         "php": ">=5.3.7",
