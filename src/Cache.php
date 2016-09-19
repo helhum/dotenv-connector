@@ -23,7 +23,19 @@ class Cache
      * @var string
      */
     protected $cacheDirectory;
+
+    /**
+     * Absolute path to .env file
+     *
+     * @var string
+     */
     protected $dotEnvFile;
+
+    /**
+     * Absolute path to cache file
+     *
+     * @var string
+     */
     protected $cacheFileName;
 
     public function __construct($cacheDirectory, $dotEnvDirectory)
@@ -34,7 +46,8 @@ class Cache
 
     public function isEnabled()
     {
-        return !empty($this->cacheDirectory)
+        return is_string($this->cacheDirectory)
+            && $this->cacheDirectory !== ''
             && is_dir($this->cacheDirectory)
             && is_writable($this->cacheDirectory);
     }
@@ -46,6 +59,7 @@ class Cache
 
     public function loadCache()
     {
+        /** @noinspection PhpIncludeInspection */
         require $this->getCacheFileName();
     }
 
@@ -63,7 +77,7 @@ class Cache
 
     protected function getCacheFileName()
     {
-        if (empty($this->cacheFileName)) {
+        if ($this->cacheFileName === null) {
             $this->cacheFileName = $this->cacheDirectory . sprintf(self::CACHE_FILE_PATTERN, md5('cache_id_' . filemtime($this->dotEnvFile)));
         }
         return $this->cacheFileName;
@@ -71,9 +85,6 @@ class Cache
 
     protected function getCacheFileGlob()
     {
-        if (empty($this->cacheFileName)) {
-            $this->cacheFileName = $this->cacheDirectory . sprintf(self::CACHE_FILE_PATTERN, '*');
-        }
-        return $this->cacheFileName;
+        return $this->cacheDirectory . sprintf(self::CACHE_FILE_PATTERN, '*');
     }
 }

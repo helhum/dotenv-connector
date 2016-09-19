@@ -63,11 +63,12 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * Plugin callback for this script event, which calls the previously implemented static method
      *
      * @param Event $event
-     * @return bool
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public static function onPreAutoloadDump(Event $event)
     {
-        if (empty(self::$config)) {
+        if (self::$config === null) {
             self::$config = Config::load($event->getIO(), $event->getComposer()->getConfig());
         }
         $includeFile = self::getResourcesPath() . '/' . self::INCLUDE_FILE;
@@ -79,6 +80,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * Constructs the include file content
      *
      * @return array
+     * @throws \RuntimeException
+     * @throws \InvalidArgumentException
      */
     protected static function getIncludeFileContent()
     {
@@ -91,7 +94,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         );
         $cacheDir = self::$config->get('cache-dir');
         $allowOverridesCode = self::$config->get('allow-overrides') ? 'true' : 'false';
-        if (empty($cacheDir) || $cacheDir === self::$config->getBaseDir()) {
+        if ($cacheDir === '' || $cacheDir === self::$config->getBaseDir()) {
             $pathToCacheDirCode = '\'\'';
         } else {
             $cache = new Cache($cacheDir, self::$config->get('env-dir'));
@@ -113,7 +116,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     protected static function getResourcesPath()
     {
-        return realpath(__DIR__ . '/../' . self::RESOURCES_PATH);
+        return realpath(dirname(__DIR__) . self::RESOURCES_PATH);
     }
 
     /**
@@ -126,7 +129,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     protected static function replaceToken($name, $content, $subject)
     {
-        $subject = str_replace('{$' . $name . '}', $content, $subject);
-        return $subject;
+        return str_replace('{$' . $name . '}', $content, $subject);
     }
 }
