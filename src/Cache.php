@@ -46,8 +46,7 @@ class Cache
 
     public function isEnabled()
     {
-        return is_string($this->cacheDirectory)
-            && $this->cacheDirectory !== ''
+        return $this->cacheDirectory !== null
             && is_dir($this->cacheDirectory)
             && is_writable($this->cacheDirectory);
     }

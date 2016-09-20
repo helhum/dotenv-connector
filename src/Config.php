@@ -22,7 +22,7 @@ class Config
      */
     public static $defaultConfig = array(
         'env-dir' => '',
-        'cache-dir' => '',
+        'cache-dir' => null,
         'allow-overrides' => true,
     );
 
@@ -71,15 +71,15 @@ class Config
      */
     public function get($key, $flags = 0)
     {
+        if (!isset($this->config[$key])) {
+            return null;
+        }
         switch ($key) {
             case 'env-dir':
             case 'cache-dir':
                 $val = rtrim($this->process($this->config[$key], $flags), '/\\');
                 return ($flags & self::RELATIVE_PATHS == 1) ? $val : $this->realpath($val);
             default:
-                if (!isset($this->config[$key])) {
-                    return null;
-                }
                 return $this->process($this->config[$key], $flags);
         }
     }

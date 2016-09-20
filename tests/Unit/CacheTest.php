@@ -69,6 +69,15 @@ class CacheTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function isEnabledReturnsFalseWhenDirIsNull()
+    {
+        $cache = new Cache(null, __DIR__ . '/Fixtures/env');
+        $this->assertFalse($cache->isEnabled());
+    }
+
+    /**
+     * @test
+     */
     public function isEnabledReturnsFalseWhenDirIsNotWritable()
     {
         $cacheDir = __DIR__ . '/Fixtures/cache';

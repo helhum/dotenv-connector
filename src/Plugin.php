@@ -108,8 +108,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         );
         $cacheDir = self::$config->get('cache-dir');
         $allowOverridesCode = self::$config->get('allow-overrides') ? 'true' : 'false';
-        if ($cacheDir === '' || $cacheDir === self::$config->getBaseDir()) {
-            $pathToCacheDirCode = '\'\'';
+        if ($cacheDir === null) {
+            $pathToCacheDirCode = 'null';
         } else {
             $cache = new Cache($cacheDir, self::$config->get('env-dir'));
             $cache->cleanCache();
