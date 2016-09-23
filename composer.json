@@ -29,7 +29,7 @@
         "mikey179/vfsStream": "~1.6.0"
     },
     "scripts": {
-        "pre-autoload-dump": "Helhum\\DotEnvConnector\\Plugin::onPreAutoloadDump"
+        "pre-autoload-dump": "echo '<?php' > res/PHP/dotenv-include.php"
     },
     "extra": {
         "class": "Helhum\\DotEnvConnector\\Plugin",

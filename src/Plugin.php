@@ -14,7 +14,6 @@ use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;
-use Composer\Script\Event;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem;
 
@@ -34,6 +33,11 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     const INCLUDE_FILE_TEMPLATE = '/res/PHP/dotenv-include.tmpl';
 
     /**
+     * @var Composer
+     */
+    protected $composer;
+
+    /**
      * @var IOInterface
      */
     protected $io;
@@ -41,7 +45,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * @var Config
      */
-    protected static $config;
+    protected $config;
 
     /**
      * Apply plugin modifications to composer
@@ -51,7 +55,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function activate(Composer $composer, IOInterface $io)
     {
-        self::$config = Config::load($io, $composer->getConfig());
+        $this->config = Config::load($io, $composer->getConfig());
+        $this->composer = $composer;
         $this->io = $io;
     }
 
@@ -68,26 +73,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Plugin callback for this script event, which calls the previously implemented static method
      *
-     * @param Event $event
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    public static function onPreAutoloadDump(Event $event)
+    public function onPreAutoloadDump()
     {
-        $composerConfig = $event->getComposer()->getConfig();
-        if (self::$config === null) {
-            self::$config = Config::load($event->getIO(), $composerConfig);
-        }
+        $composerConfig = $this->composer->getConfig();
         $includeFile = $composerConfig->get('vendor-dir') . self::INCLUDE_FILE;
         $fs = new Filesystem();
         $fs->ensureDirectoryExists(dirname($includeFile));
-        $includeFileContent = self::getIncludeFileContent($includeFile);
+        $includeFileContent = $this->getIncludeFileContent($includeFile);
         file_put_contents($includeFile, $includeFileContent);
 
-        $composer = $event->getComposer();
-        $autoload = $composer->getPackage()->getAutoload();
+        $autoload = $this->composer->getPackage()->getAutoload();
         $autoload['files'][] = $includeFile;
-        $composer->getPackage()->setAutoload($autoload);
+        $this->composer->getPackage()->setAutoload($autoload);
     }
 
     /**
@@ -98,18 +98,18 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
-    protected static function getIncludeFileContent($includeFile)
+    protected function getIncludeFileContent($includeFile)
     {
         $filesystem = new Filesystem();
         $includeFileTemplate = dirname(__DIR__) . self::INCLUDE_FILE_TEMPLATE;
-        $envDir = self::$config->get('env-dir');
+        $envDir = $this->config->get('env-dir');
         $pathToEnvFileCode = $filesystem->findShortestPathCode(
             dirname($includeFile),
             $envDir,
             true
         );
-        $cacheDir = self::$config->get('cache-dir');
-        $allowOverridesCode = self::$config->get('allow-overrides') ? 'true' : 'false';
+        $cacheDir = $this->config->get('cache-dir');
+        $allowOverridesCode = $this->config->get('allow-overrides') ? 'true' : 'false';
         if ($cacheDir === null) {
             $pathToCacheDirCode = 'null';
         } else {
@@ -118,9 +118,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             $pathToCacheDirCode = $filesystem->findShortestPathCode(dirname($includeFile), $cacheDir, true);
         }
         $includeFileContent = file_get_contents($includeFileTemplate);
-        $includeFileContent = self::replaceToken('env-dir', $pathToEnvFileCode, $includeFileContent);
-        $includeFileContent = self::replaceToken('allow-overrides', $allowOverridesCode, $includeFileContent);
-        $includeFileContent = self::replaceToken('cache-dir', $pathToCacheDirCode, $includeFileContent);
+        $includeFileContent = $this->replaceToken('env-dir', $pathToEnvFileCode, $includeFileContent);
+        $includeFileContent = $this->replaceToken('allow-overrides', $allowOverridesCode, $includeFileContent);
+        $includeFileContent = $this->replaceToken('cache-dir', $pathToCacheDirCode, $includeFileContent);
 
         return $includeFileContent;
     }
@@ -133,7 +133,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * @param string $subject
      * @return string
      */
-    protected static function replaceToken($name, $content, $subject)
+    protected function replaceToken($name, $content, $subject)
     {
         return str_replace('{$' . $name . '}', $content, $subject);
     }
