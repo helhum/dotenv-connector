@@ -81,7 +81,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $includeFile = $composerConfig->get('vendor-dir') . self::INCLUDE_FILE;
         $fs = new Filesystem();
         $fs->ensureDirectoryExists(dirname($includeFile));
-        $includeFileContent = self::getIncludeFileContent();
+        $includeFileContent = self::getIncludeFileContent($includeFile);
         file_put_contents($includeFile, $includeFileContent);
 
         $composer = $event->getComposer();
@@ -93,17 +93,19 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Constructs the include file content
      *
+     * @param string $includeFile The path to the file that will be included by composer in autoload.php
      * @return array
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
-    protected static function getIncludeFileContent()
+    protected static function getIncludeFileContent($includeFile)
     {
         $filesystem = new Filesystem();
-        $includeFileTemplate = realpath(dirname(__DIR__) . self::INCLUDE_FILE_TEMPLATE);
+        $includeFileTemplate = dirname(__DIR__) . self::INCLUDE_FILE_TEMPLATE;
+        $envDir = self::$config->get('env-dir');
         $pathToEnvFileCode = $filesystem->findShortestPathCode(
-            dirname($includeFileTemplate),
-            self::$config->get('env-dir'),
+            dirname($includeFile),
+            $envDir,
             true
         );
         $cacheDir = self::$config->get('cache-dir');
@@ -111,9 +113,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         if ($cacheDir === null) {
             $pathToCacheDirCode = 'null';
         } else {
-            $cache = new Cache($cacheDir, self::$config->get('env-dir'));
+            $cache = new Cache($cacheDir, $envDir);
             $cache->cleanCache();
-            $pathToCacheDirCode = $filesystem->findShortestPathCode(dirname($includeFileTemplate), $cacheDir, true);
+            $pathToCacheDirCode = $filesystem->findShortestPathCode(dirname($includeFile), $cacheDir, true);
         }
         $includeFileContent = file_get_contents($includeFileTemplate);
         $includeFileContent = self::replaceToken('env-dir', $pathToEnvFileCode, $includeFileContent);
