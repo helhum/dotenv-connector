@@ -80,14 +80,15 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     {
         $composerConfig = $this->composer->getConfig();
         $includeFile = $composerConfig->get('vendor-dir') . self::INCLUDE_FILE;
-        $fs = new Filesystem();
-        $fs->ensureDirectoryExists(dirname($includeFile));
+        $filesystem = new Filesystem();
+        $filesystem->ensureDirectoryExists(dirname($includeFile));
         $includeFileContent = $this->getIncludeFileContent($includeFile);
         file_put_contents($includeFile, $includeFileContent);
 
-        $autoload = $this->composer->getPackage()->getAutoload();
-        $autoload['files'][] = $includeFile;
-        $this->composer->getPackage()->setAutoload($autoload);
+        $rootPackage = $this->composer->getPackage();
+        $autoloadDefinition = $rootPackage->getAutoload();
+        $autoloadDefinition['files'][] = $includeFile;
+        $rootPackage->setAutoload($autoloadDefinition);
     }
 
     /**
