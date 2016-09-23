@@ -83,12 +83,15 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $filesystem = new Filesystem();
         $filesystem->ensureDirectoryExists(dirname($includeFile));
         $includeFileContent = $this->getIncludeFileContent($includeFile);
-        file_put_contents($includeFile, $includeFileContent);
-
-        $rootPackage = $this->composer->getPackage();
-        $autoloadDefinition = $rootPackage->getAutoload();
-        $autoloadDefinition['files'][] = $includeFile;
-        $rootPackage->setAutoload($autoloadDefinition);
+        if (false !== @file_put_contents($includeFile, $includeFileContent)) {
+            $rootPackage = $this->composer->getPackage();
+            $autoloadDefinition = $rootPackage->getAutoload();
+            $autoloadDefinition['files'][] = $includeFile;
+            $rootPackage->setAutoload($autoloadDefinition);
+            $this->io->writeError('<info>Registered helhum/dotenv-connector in composer autoload definition</info>');
+        } else {
+            $this->io->writeError('<error>Could not dump helhum/dotenv-connector autoload include file</error>');
+        }
     }
 
     /**
