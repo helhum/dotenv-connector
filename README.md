@@ -7,7 +7,7 @@ without the need to modify the project.
 ## Background info
 You may want to read why it is a good idea to [store config in the environment](http://12factor.net/config).
 The idea of [dotenv](http://opensoul.org/2012/07/24/dotenv/) is to make this as easy as possible and this is why
-the [phpdotnev](https://github.com/vlucas/phpdotenv) library was created.
+the [phpdotenv](https://github.com/vlucas/phpdotenv) library was created.
 phpdotnev loads environment variables from an `.env` file to getenv(), $_ENV and $_SERVER, but you need to
 add the parsing code for that yourself.
 
