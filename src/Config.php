@@ -18,7 +18,7 @@ class Config
      * @var array
      */
     public static $defaultConfig = [
-        'env-dir' => '',
+        'env-file' => '.env',
         'cache-dir' => null,
     ];
 
@@ -71,7 +71,7 @@ class Config
             return null;
         }
         switch ($key) {
-            case 'env-dir':
+            case 'env-file':
             case 'cache-dir':
                 $val = rtrim($this->process($this->config[$key], $flags), '/\\');
                 return ($flags & self::RELATIVE_PATHS == 1) ? $val : $this->realpath($val);

@@ -106,21 +106,21 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     {
         $filesystem = new Filesystem();
         $includeFileTemplate = dirname(__DIR__) . self::INCLUDE_FILE_TEMPLATE;
-        $envDir = $this->config->get('env-dir');
+        $envFile = $this->config->get('env-file');
         $pathToEnvFileCode = $filesystem->findShortestPathCode(
             dirname($includeFile),
-            $envDir
+            $envFile
         );
         $cacheDir = $this->config->get('cache-dir');
         if ($cacheDir === null) {
             $pathToCacheDirCode = 'null';
         } else {
-            $cache = new Cache($cacheDir, $envDir);
+            $cache = new Cache($cacheDir, $envFile);
             $cache->cleanCache();
             $pathToCacheDirCode = $filesystem->findShortestPathCode(dirname($includeFile), $cacheDir, true);
         }
         $includeFileContent = file_get_contents($includeFileTemplate);
-        $includeFileContent = $this->replaceToken('env-dir', $pathToEnvFileCode, $includeFileContent);
+        $includeFileContent = $this->replaceToken('env-file', $pathToEnvFileCode, $includeFileContent);
         $includeFileContent = $this->replaceToken('cache-dir', $pathToCacheDirCode, $includeFileContent);
 
         return $includeFileContent;

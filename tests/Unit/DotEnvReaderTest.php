@@ -27,8 +27,8 @@ class DotEnvReaderTest extends \PHPUnit_Framework_TestCase
     public function readerExposesVarsInFile()
     {
         $cacheMock = $this->getMockBuilder('Helhum\\DotEnvConnector\\Cache')->disableOriginalConstructor()->getMock();
-        $envDir = __DIR__ . '/Fixtures/env';
-        $reader = new DotEnvReader(new Dotenv($envDir), $cacheMock);
+        $envFile = __DIR__ . '/Fixtures/env/.env';
+        $reader = new DotEnvReader(new Dotenv(dirname($envFile)), $cacheMock);
         $reader->read();
         $this->assertSame('bar', getenv('FOO'));
     }
@@ -39,8 +39,8 @@ class DotEnvReaderTest extends \PHPUnit_Framework_TestCase
     public function readerDisablesOverrideEnvVarsByDefault()
     {
         $cacheMock = $this->getMockBuilder('Helhum\\DotEnvConnector\\Cache')->disableOriginalConstructor()->getMock();
-        $envDir = __DIR__ . '/Fixtures/env';
-        $reader = new DotEnvReader(new Dotenv($envDir), $cacheMock);
+        $envFile = __DIR__ . '/Fixtures/env/.env';
+        $reader = new DotEnvReader(new Dotenv(dirname($envFile)), $cacheMock);
         putenv('FOO=baz');
         $reader->read();
         $this->assertSame('baz', getenv('FOO'));
@@ -72,8 +72,8 @@ putenv(\'FOO=bar\');
 $_ENV[\'FOO\'] = \'bar\';
 $_SERVER[\'FOO\'] = \'bar\';
 ');
-        $envDir = __DIR__ . '/Fixtures/env';
-        $reader = new DotEnvReader(new Dotenv($envDir), $cacheMock);
+        $envFile = __DIR__ . '/Fixtures/env/.env';
+        $reader = new DotEnvReader(new Dotenv(dirname($envFile)), $cacheMock);
         $reader->read();
         $this->assertSame('bar', getenv('FOO'));
     }

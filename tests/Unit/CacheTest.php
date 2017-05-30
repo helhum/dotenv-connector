@@ -112,14 +112,14 @@ class CacheTest extends \PHPUnit_Framework_TestCase
     public function touchChangesCacheFile()
     {
         $cacheDir = __DIR__ . '/Fixtures/cache';
-        $envFilePath = __DIR__ . '/Fixtures/env';
-        $cache = new Cache($cacheDir, $envFilePath);
+        $envFile = __DIR__ . '/Fixtures/env/.env';
+        $cache = new Cache($cacheDir, $envFile);
         $cache->storeCache('<?php' . PHP_EOL . '$GLOBALS[\'BLA\'] = \'blupp\';');
-        $origContent = file_get_contents($envFilePath . '/.env');
-        file_put_contents($envFilePath . '/.env', $origContent . PHP_EOL);
+        $origContent = file_get_contents($envFile);
+        file_put_contents($envFile, $origContent . PHP_EOL);
         clearstatcache();
-        $cache = new Cache($cacheDir, $envFilePath);
+        $cache = new Cache($cacheDir, $envFile);
         $this->assertFalse($cache->hasCache());
-        file_put_contents($envFilePath . '/.env', $origContent);
+        file_put_contents($envFile, $origContent);
     }
 }

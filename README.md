@@ -26,17 +26,16 @@ You configure dotenv connector in the extra section of the root `composer.json` 
 ```
   "extra": {
       "helhum/dotenv-connector": {
-          "env-dir": "",
+          "env-file": ".env",
           "cache-dir": "var/cache"
       }
     }
 ```
 
-#### `env-dir`
+#### `env-file`
 You can specify a relative path from the base directory, if you want to put your `.env` file a different location.
 
-*The default value* is "", which means next to your next to your root `composer.json`.
-
+*The default value* is ".env", which means next to your next to your root `composer.json`.
 
 #### `cache-dir`
 If you want to make use of the caching feature of this plugin, you must set this value to a valid (and writable) path.

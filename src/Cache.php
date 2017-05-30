@@ -38,10 +38,10 @@ class Cache
      */
     protected $cacheFileName;
 
-    public function __construct($cacheDirectory, $dotEnvDirectory)
+    public function __construct($cacheDirectory, $dotEnvFile)
     {
         $this->cacheDirectory = $cacheDirectory;
-        $this->dotEnvFile = $dotEnvDirectory . '/.env';
+        $this->dotEnvFile = $dotEnvFile;
     }
 
     public function isEnabled()
