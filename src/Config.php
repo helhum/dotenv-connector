@@ -20,7 +20,6 @@ class Config
     public static $defaultConfig = [
         'env-dir' => '',
         'cache-dir' => null,
-        'allow-overrides' => true,
     ];
 
     /**

@@ -27,7 +27,6 @@ You configure dotenv connector in the extra section of the root `composer.json` 
   "extra": {
       "helhum/dotenv-connector": {
           "env-dir": "",
-          "allow-overrides": true,
           "cache-dir": "var/cache"
       }
     }
@@ -38,11 +37,6 @@ You can specify a relative path from the base directory, if you want to put your
 
 *The default value* is "", which means next to your next to your root `composer.json`.
 
-#### `allow-overrides`
-If `true` it means that already present environment variables are allowed to be overridden by values in your `.env`.
-Set this to `false` if you want to be able to override application behavior without modifying the `.env`
-
-*The default value* is `true`
 
 #### `cache-dir`
 If you want to make use of the caching feature of this plugin, you must set this value to a valid (and writable) path.

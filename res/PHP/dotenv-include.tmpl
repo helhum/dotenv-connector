@@ -1,7 +1,7 @@
 <?php
-call_user_func(function($dotEnvDir, $cacheDir, $allowOverrides) {
+call_user_func(function($dotEnvDir, $cacheDir) {
     if (file_exists($dotEnvDir . '/.env')) {
-        $dotEnvReader = new \Helhum\DotEnvConnector\DotEnvReader(new \Dotenv\Dotenv($dotEnvDir), new \Helhum\DotEnvConnector\Cache($cacheDir, $dotEnvDir), $allowOverrides);
+        $dotEnvReader = new \Helhum\DotEnvConnector\DotEnvReader(new \Dotenv\Dotenv($dotEnvDir), new \Helhum\DotEnvConnector\Cache($cacheDir, $dotEnvDir));
         $dotEnvReader->read();
     }
-}, {$env-dir}, {$cache-dir}, {$allow-overrides});
+}, {$env-dir}, {$cache-dir});

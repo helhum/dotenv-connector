@@ -1,27 +1,4 @@
 <?php
-/**
- * This file is part of the typo3 console project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * The GNU General Public License can be found at
- * http://www.gnu.org/copyleft/gpl.html.
- *
- */
-
-/**
- * This file is part of the typo3 console project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * The GNU General Public License can be found at
- * http://www.gnu.org/copyleft/gpl.html.
- *
- */
 namespace Helhum\DotEnvConnector\tests\Unit;
 
 /*
@@ -35,9 +12,6 @@ namespace Helhum\DotEnvConnector\tests\Unit;
 
 use Helhum\DotEnvConnector\Cache;
 
-/**
- * Class CacheTest
- */
 class CacheTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()

@@ -109,11 +109,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $envDir = $this->config->get('env-dir');
         $pathToEnvFileCode = $filesystem->findShortestPathCode(
             dirname($includeFile),
-            $envDir,
-            true
+            $envDir
         );
         $cacheDir = $this->config->get('cache-dir');
-        $allowOverridesCode = $this->config->get('allow-overrides') ? 'true' : 'false';
         if ($cacheDir === null) {
             $pathToCacheDirCode = 'null';
         } else {
@@ -123,7 +121,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         }
         $includeFileContent = file_get_contents($includeFileTemplate);
         $includeFileContent = $this->replaceToken('env-dir', $pathToEnvFileCode, $includeFileContent);
-        $includeFileContent = $this->replaceToken('allow-overrides', $allowOverridesCode, $includeFileContent);
         $includeFileContent = $this->replaceToken('cache-dir', $pathToCacheDirCode, $includeFileContent);
 
         return $includeFileContent;

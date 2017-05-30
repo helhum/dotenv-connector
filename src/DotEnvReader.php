@@ -23,13 +23,6 @@ class DotEnvReader
     protected $cache;
 
     /**
-     * Whether or not it is allowed to override existing environment vars
-     *
-     * @var bool
-     */
-    protected $allowOverloading = true;
-
-    /**
      * The .env parser/loader
      *
      * @var Dotenv
@@ -41,13 +34,11 @@ class DotEnvReader
      *
      * @param Dotenv $dotEnv The .env parser/loader
      * @param Cache $cache Cache handler
-     * @param bool $allowOverloading Whether or not existing environment vars should be overridden by .env
      */
-    public function __construct(Dotenv $dotEnv, Cache $cache, $allowOverloading = false)
+    public function __construct(Dotenv $dotEnv, Cache $cache)
     {
         $this->dotEnv = $dotEnv;
         $this->cache = $cache;
-        $this->allowOverloading = $allowOverloading;
     }
 
     /**
@@ -74,11 +65,7 @@ class DotEnvReader
      */
     protected function parseEnvironmentVariables()
     {
-        if ($this->allowOverloading) {
-            $this->dotEnv->overload();
-        } else {
-            $this->dotEnv->load();
-        }
+        $this->dotEnv->load();
     }
 
     /**

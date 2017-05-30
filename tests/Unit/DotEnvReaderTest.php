@@ -1,15 +1,4 @@
 <?php
-/**
- * This file is part of the typo3 console project.
- *
- * It is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License, either version 2
- * of the License, or any later version.
- *
- * The GNU General Public License can be found at
- * http://www.gnu.org/copyleft/gpl.html.
- *
- */
 namespace Helhum\DotEnvConnector\tests\Unit;
 
 /*
@@ -24,9 +13,6 @@ namespace Helhum\DotEnvConnector\tests\Unit;
 use Dotenv\Dotenv;
 use Helhum\DotEnvConnector\DotEnvReader;
 
-/**
- * Class DotEnvReaderTest
- */
 class DotEnvReaderTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()
@@ -63,14 +49,14 @@ class DotEnvReaderTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      */
-    public function readerOverridesEnvVars()
+    public function readerDoesNotOverrideExistingEnvVars()
     {
         $cacheMock = $this->getMockBuilder('Helhum\\DotEnvConnector\\Cache')->disableOriginalConstructor()->getMock();
-        $envDir = __DIR__ . '/Fixtures/env';
-        $reader = new DotEnvReader(new Dotenv($envDir), $cacheMock, true);
+        $envFile = __DIR__ . '/Fixtures/env/.env';
+        $reader = new DotEnvReader(new Dotenv(dirname($envFile)), $cacheMock);
         putenv('FOO=baz');
         $reader->read();
-        $this->assertSame('bar', getenv('FOO'));
+        $this->assertSame('baz', getenv('FOO'));
     }
 
     /**
