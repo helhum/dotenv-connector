@@ -17,20 +17,12 @@ use Composer\Plugin\PluginInterface;
 use Composer\Script\ScriptEvents;
 use Composer\Util\Filesystem;
 
-/**
- * Class Plugin
- */
 class Plugin implements PluginInterface, EventSubscriberInterface
 {
     /**
      * Path to include file relative to vendor dir
      */
     const INCLUDE_FILE = '/helhum/dotenv-include.php';
-
-    /**
-     * Path to include file template relative to package dir
-     */
-    const INCLUDE_FILE_TEMPLATE = '/res/PHP/dotenv-include.php.tmpl';
 
     /**
      * @var Composer
@@ -78,55 +70,15 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPreAutoloadDump()
     {
-        $composerConfig = $this->composer->getConfig();
-        $includeFile = $composerConfig->get('vendor-dir') . self::INCLUDE_FILE;
-        $filesystem = new Filesystem();
-        $filesystem->ensureDirectoryExists(dirname($includeFile));
-        $includeFileContent = $this->getIncludeFileContent($includeFile);
-        if (false !== @file_put_contents($includeFile, $includeFileContent)) {
+        $includeFile = new IncludeFile($this->config, $this->composer->getConfig()->get('vendor-dir') . self::INCLUDE_FILE);
+        if ($includeFile->dump()) {
             $rootPackage = $this->composer->getPackage();
             $autoloadDefinition = $rootPackage->getAutoload();
             $autoloadDefinition['files'][] = $includeFile;
             $rootPackage->setAutoload($autoloadDefinition);
-            $this->io->writeError('<info>Registered helhum/dotenv-connector in composer autoload definition</info>');
+            $this->io->writeError('<info>Registered helhum/dotenv-connector</info>');
         } else {
             $this->io->writeError('<error>Could not dump helhum/dotenv-connector autoload include file</error>');
         }
-    }
-
-    /**
-     * Constructs the include file content
-     *
-     * @param string $includeFile The path to the file that will be included by composer in autoload.php
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @return string
-     */
-    protected function getIncludeFileContent($includeFile)
-    {
-        $filesystem = new Filesystem();
-        $includeFileTemplate = dirname(__DIR__) . self::INCLUDE_FILE_TEMPLATE;
-        $envFile = $this->config->get('env-file');
-        $pathToEnvFileCode = $filesystem->findShortestPathCode(
-            dirname($includeFile),
-            $envFile
-        );
-        $includeFileContent = file_get_contents($includeFileTemplate);
-        $includeFileContent = $this->replaceToken('env-file', $pathToEnvFileCode, $includeFileContent);
-
-        return $includeFileContent;
-    }
-
-    /**
-     * Replaces a token in the subject (PHP code)
-     *
-     * @param string $name
-     * @param string $content
-     * @param string $subject
-     * @return string
-     */
-    private function replaceToken($name, $content, $subject)
-    {
-        return str_replace('\'{$' . $name . '}\'', $content, $subject);
     }
 }
