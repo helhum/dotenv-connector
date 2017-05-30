@@ -10,9 +10,6 @@ namespace Helhum\DotEnvConnector;
  * file that was distributed with this source code.
  */
 
-/**
- * Class Config
- */
 class Config
 {
     const RELATIVE_PATHS = 1;
@@ -91,7 +88,7 @@ class Config
     public function all($flags = 0)
     {
         $all = array();
-        foreach (array_keys($this->config) as $key) {
+        foreach ($this->config as $key => $_) {
             $all['config'][$key] = $this->get($key, $flags);
         }
 
@@ -155,7 +152,7 @@ class Config
             return $this->baseDir;
         }
 
-        if (substr($path, 0, 1) === '/' || substr($path, 1, 1) === ':') {
+        if ($path[0] === '/' || $path[1] === ':') {
             return $path;
         }
 
@@ -173,7 +170,7 @@ class Config
     /**
      * @param \Composer\IO\IOInterface $io
      * @param \Composer\Config $composerConfig
-     * @return \Composer\Config
+     * @return Config
      */
     public static function load(\Composer\IO\IOInterface $io, \Composer\Config $composerConfig)
     {

@@ -98,7 +98,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * Constructs the include file content
      *
      * @param string $includeFile The path to the file that will be included by composer in autoload.php
-     * @return array
+     * @return string
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
      */
