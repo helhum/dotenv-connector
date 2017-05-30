@@ -45,7 +45,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
         $cacheDir = __DIR__ . '/Fixtures/cache';
         foreach (glob($cacheDir . '/*.php') as $file) {
             unlink($file);
-        };
+        }
     }
 
     /**

@@ -65,9 +65,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            ScriptEvents::PRE_AUTOLOAD_DUMP => array('onPreAutoloadDump')
-        );
+        return [
+            ScriptEvents::PRE_AUTOLOAD_DUMP => ['onPreAutoloadDump'],
+        ];
     }
 
     /**
@@ -98,9 +98,9 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * Constructs the include file content
      *
      * @param string $includeFile The path to the file that will be included by composer in autoload.php
-     * @return string
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
+     * @return string
      */
     protected function getIncludeFileContent($includeFile)
     {

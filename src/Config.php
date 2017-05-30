@@ -17,11 +17,11 @@ class Config
     /**
      * @var array
      */
-    public static $defaultConfig = array(
+    public static $defaultConfig = [
         'env-dir' => '',
         'cache-dir' => null,
         'allow-overrides' => true,
-    );
+    ];
 
     /**
      * @var array
@@ -87,7 +87,7 @@ class Config
      */
     public function all($flags = 0)
     {
-        $all = array();
+        $all = [];
         foreach ($this->config as $key => $_) {
             $all['config'][$key] = $this->get($key, $flags);
         }
@@ -100,9 +100,9 @@ class Config
      */
     public function raw()
     {
-        return array(
+        return [
             'config' => $this->config,
-        );
+        ];
     }
 
     /**
@@ -176,7 +176,7 @@ class Config
     {
         static $config;
         if ($config === null) {
-            $baseDir = realpath(substr($composerConfig->get('vendor-dir'), 0, -strlen($composerConfig->get('vendor-dir', Config::RELATIVE_PATHS))));
+            $baseDir = realpath(substr($composerConfig->get('vendor-dir'), 0, -strlen($composerConfig->get('vendor-dir', self::RELATIVE_PATHS))));
             $localConfig = \Composer\Factory::getComposerFile();
             $file = new \Composer\Json\JsonFile($localConfig, new \Composer\Util\RemoteFilesystem($io));
 
