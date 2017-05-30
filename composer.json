@@ -6,7 +6,7 @@
     "keywords": [
         "composer", "env", "12factor", "dotenv"
     ],
-    "homepage": "http://github.com/helhum/dotenv-connector",
+    "homepage": "https://github.com/helhum/dotenv-connector",
     "authors": [
         {
             "name": "Helmut Hummel",
