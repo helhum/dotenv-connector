@@ -30,7 +30,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     /**
      * Path to include file template relative to package dir
      */
-    const INCLUDE_FILE_TEMPLATE = '/res/PHP/dotenv-include.tmpl';
+    const INCLUDE_FILE_TEMPLATE = '/res/PHP/dotenv-include.php.tmpl';
 
     /**
      * @var Composer
@@ -111,17 +111,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             dirname($includeFile),
             $envFile
         );
-        $cacheDir = $this->config->get('cache-dir');
-        if ($cacheDir === null) {
-            $pathToCacheDirCode = 'null';
-        } else {
-            $cache = new Cache($cacheDir, $envFile);
-            $cache->cleanCache();
-            $pathToCacheDirCode = $filesystem->findShortestPathCode(dirname($includeFile), $cacheDir, true);
-        }
         $includeFileContent = file_get_contents($includeFileTemplate);
         $includeFileContent = $this->replaceToken('env-file', $pathToEnvFileCode, $includeFileContent);
-        $includeFileContent = $this->replaceToken('cache-dir', $pathToCacheDirCode, $includeFileContent);
 
         return $includeFileContent;
     }
@@ -134,8 +125,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      * @param string $subject
      * @return string
      */
-    protected function replaceToken($name, $content, $subject)
+    private function replaceToken($name, $content, $subject)
     {
-        return str_replace('{$' . $name . '}', $content, $subject);
+        return str_replace('\'{$' . $name . '}\'', $content, $subject);
     }
 }

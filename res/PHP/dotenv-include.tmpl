@@ -1,7 +1,0 @@
-<?php
-call_user_func(function($dotEnvFile, $cacheDir) {
-    if (file_exists($dotEnvFile)) {
-        $dotEnvReader = new \Helhum\DotEnvConnector\DotEnvReader(new \Dotenv\Dotenv(dirname($dotEnvFile)), new \Helhum\DotEnvConnector\Cache($cacheDir, $dotEnvFile));
-        $dotEnvReader->read();
-    }
-}, {$env-dir}, {$cache-dir});
