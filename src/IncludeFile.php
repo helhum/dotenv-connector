@@ -68,7 +68,7 @@ class IncludeFile
     {
         $envFile = $this->config->get('env-file');
         $pathToEnvFileCode = $this->filesystem->findShortestPathCode(
-            dirname($this->includeFile),
+            $this->includeFile,
             $envFile
         );
         $includeFileContent = file_get_contents($this->includeFileTemplate);

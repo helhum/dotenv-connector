@@ -8,7 +8,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()
     {
-        @unlink(__DIR__ . '/Fixtures/include.php');
+        @unlink(__DIR__ . '/Fixtures/vendor/helhum/include.php');
         putenv('FOO');
         putenv('APP_ENV');
         @chmod(__DIR__ . '/Fixtures/foo', 777);
@@ -22,7 +22,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
-        $includeFilePath = __DIR__ . '/Fixtures/include.php';
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
@@ -35,7 +35,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
-        $includeFilePath = __DIR__ . '/Fixtures/include.php';
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
@@ -50,7 +50,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
-        $includeFilePath = __DIR__ . '/Fixtures/include.php';
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
@@ -66,7 +66,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
-        $includeFilePath = __DIR__ . '/Fixtures/include.php';
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
