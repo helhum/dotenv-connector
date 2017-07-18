@@ -43,7 +43,7 @@ You configure dotenv connector in the extra section of the root `composer.json` 
 #### `env-file`
 You can specify a relative path from the base directory, if you want to put your `.env` file a different location.
 
-*The default value* is ".env", which means next to your next to your root `composer.json`.
+*The default value* is ".env", which means next to your root `composer.json`.
 
 
 
