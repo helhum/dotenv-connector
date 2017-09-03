@@ -70,6 +70,10 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPreAutoloadDump()
     {
+        if (!class_exists(IncludeFile::class)) {
+            // Plugin package was removed
+            return;
+        }
         $includeFilePath = $this->composer->getConfig()->get('vendor-dir') . self::INCLUDE_FILE;
         $includeFile = new IncludeFile($this->config, $includeFilePath);
         if ($includeFile->dump()) {
