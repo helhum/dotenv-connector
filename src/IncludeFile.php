@@ -67,10 +67,15 @@ class IncludeFile
     private function getIncludeFileContent()
     {
         $envFile = $this->config->get('env-file');
-        $pathToEnvFileCode = $this->filesystem->findShortestPathCode(
-            $this->includeFile,
-            $envFile
-        );
+        $useAbsolutePath = $this->config->get('use-absoulte-path');
+        if ($useAbsolutePath) {
+            $pathToEnvFileCode = '\'' . realpath($envFile) .'\'';
+        } else {
+            $pathToEnvFileCode = $this->filesystem->findShortestPathCode(
+                $this->includeFile,
+                $envFile
+            );
+        }
         $includeFileContent = file_get_contents($this->includeFileTemplate);
         $includeFileContent = $this->replaceToken('env-file', $pathToEnvFileCode, $includeFileContent);
 

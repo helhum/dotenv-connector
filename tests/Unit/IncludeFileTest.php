@@ -6,6 +6,18 @@ use Helhum\DotEnvConnector\IncludeFile;
 
 class IncludeFileTest extends \PHPUnit_Framework_TestCase
 {
+
+    public function includeFileDataProvider() {
+        return [
+            'useRelativePath' => [
+                'useAbsolutePath' => false
+            ],
+            'useAbsolutePath' => [
+                'useAbsolutePath' => true
+            ]
+        ];
+    }
+
     protected function tearDown()
     {
         @unlink(__DIR__ . '/Fixtures/vendor/helhum/include.php');
@@ -17,11 +29,13 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @dataProvider includeFileDataProvider
      */
-    public function dumpDumpsFile()
+    public function dumpDumpsFile($useAbsoultePath)
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $configProphecy->get('use-absoulte-path')->willReturn($useAbsoultePath);
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
@@ -30,11 +44,13 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @dataProvider includeFileDataProvider
      */
-    public function includingFileExposesEnvVars()
+    public function includingFileExposesEnvVars($useAbsoultePath)
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $configProphecy->get('use-absoulte-path')->willReturn($useAbsoultePath);
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
@@ -45,11 +61,13 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @dataProvider includeFileDataProvider
      */
-    public function includingFileDoesNothingIfEnvVarSet()
+    public function includingFileDoesNothingIfEnvVarSet($useAbsoultePath)
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $configProphecy->get('use-absoulte-path')->willReturn($useAbsoultePath);
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
@@ -61,11 +79,13 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @dataProvider includeFileDataProvider
      */
-    public function includingFileDoesNothingIfEnvFileDoesNotExist()
+    public function includingFileDoesNothingIfEnvFileDoesNotExist($useAbsoultePath)
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
+        $configProphecy->get('use-absoulte-path')->willReturn($useAbsoultePath);
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
@@ -76,11 +96,13 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @dataProvider includeFileDataProvider
      */
-    public function dumpReturnsFalseIfFileCannotBeWritten()
+    public function dumpReturnsFalseIfFileCannotBeWritten($useAbsoultePath)
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
+        $configProphecy->get('use-absoulte-path')->willReturn($useAbsoultePath);
         mkdir(__DIR__ . '/Fixtures/foo', 000);
         $includeFilePath = __DIR__ . '/Fixtures/foo/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
