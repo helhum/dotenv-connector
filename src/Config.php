@@ -19,6 +19,7 @@ class Config
      */
     public static $defaultConfig = [
         'env-file' => '.env',
+        'use-absoulte-path' => false,
     ];
 
     /**
