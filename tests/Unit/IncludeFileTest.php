@@ -39,7 +39,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
-        require $includeFilePath;
+
         $this->assertSame('bar', getenv('FOO'));
     }
 
@@ -48,14 +48,14 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
      */
     public function includingFileDoesNothingIfEnvVarSet()
     {
+        putenv('APP_ENV=1');
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
-        putenv('APP_ENV=1');
-        require $includeFilePath;
+
         $this->assertFalse(getenv('FOO'));
     }
 
@@ -70,7 +70,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
         $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
-        require $includeFilePath;
+
         $this->assertFalse(getenv('FOO'));
     }
 
