@@ -54,7 +54,13 @@ class IncludeFile
     public function dump()
     {
         $this->filesystem->ensureDirectoryExists(dirname($this->includeFile));
-        return false !== @file_put_contents($this->includeFile, $this->getIncludeFileContent());
+        $successfullyWritten = false !== @file_put_contents($this->includeFile, $this->getIncludeFileContent());
+        if ($successfullyWritten) {
+            // Expose env vars of a possibly available .env file for following composer plugins
+            require $this->includeFile;
+        }
+
+        return $successfullyWritten;
     }
 
     /**
