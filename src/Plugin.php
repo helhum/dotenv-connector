@@ -10,6 +10,7 @@ namespace Helhum\DotEnvConnector;
  * file that was distributed with this source code.
  */
 
+use Composer\Autoload\ClassLoader;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
@@ -74,7 +75,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
             return;
         }
         $includeFilePath = $this->composer->getConfig()->get('vendor-dir') . self::INCLUDE_FILE;
-        $includeFile = new IncludeFile($this->config, $includeFilePath);
+        $includeFile = new IncludeFile($this->config, $this->createLoader(), $includeFilePath);
         if ($includeFile->dump()) {
             $rootPackage = $this->composer->getPackage();
             $autoloadDefinition = $rootPackage->getAutoload();
@@ -84,5 +85,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         } else {
             $this->io->writeError('<error>Could not dump helhum/dotenv-connector autoload include file</error>');
         }
+    }
+
+    private function createLoader(): ClassLoader
+    {
+        $package = $this->composer->getPackage();
+        $generator = $this->composer->getAutoloadGenerator();
+        $packages = $this->composer->getRepositoryManager()->getLocalRepository()->getCanonicalPackages();
+        $packageMap = $generator->buildPackageMap($this->composer->getInstallationManager(), $package, $packages);
+        $map = $generator->parseAutoloads($packageMap, $package);
+
+        return $generator->createLoader($map);
     }
 }

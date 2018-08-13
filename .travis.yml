@@ -15,6 +15,13 @@ cache:
   directories:
     - $HOME/.composer/cache
 
+# Do not build feature branches or alpha/beta releases
+branches:
+  only:
+    - master
+    - develop
+    - /^([0-9]+\.){1,2}(x|[0-9]+)$/
+
 notifications:
   email:
     - typo3@helhum.io
