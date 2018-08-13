@@ -10,6 +10,8 @@ namespace Helhum\DotEnvConnector;
  * file that was distributed with this source code.
  */
 
+use Composer\Autoload\ClassLoader;
+use Composer\Composer;
 use Composer\Util\Filesystem;
 
 class IncludeFile
@@ -18,6 +20,11 @@ class IncludeFile
      * @var Config
      */
     private $config;
+
+    /**
+     * @var ClassLoader
+     */
+    private $loader;
 
     /**
      * Absolute path to include file
@@ -30,22 +37,16 @@ class IncludeFile
      * @var string
      */
     private $includeFileTemplate;
+
     /**
      * @var Filesystem
      */
     private $filesystem;
 
-    /**
-     * IncludeFile constructor.
-     *
-     * @param Config $config
-     * @param string $includeFile
-     * @param string $includeFileTemplate
-     * @param Filesystem $filesystem
-     */
-    public function __construct(Config $config, $includeFile, $includeFileTemplate = '', Filesystem $filesystem = null)
+    public function __construct(Config $config, ClassLoader $loader, $includeFile, $includeFileTemplate = '', Filesystem $filesystem = null)
     {
         $this->config = $config;
+        $this->loader = $loader;
         $this->includeFile = $includeFile;
         $this->includeFileTemplate = $includeFileTemplate ?: dirname(__DIR__) . '/res/PHP/dotenv-include.php.tmpl';
         $this->filesystem = $filesystem ?: new Filesystem();
@@ -57,7 +58,9 @@ class IncludeFile
         $successfullyWritten = false !== @file_put_contents($this->includeFile, $this->getIncludeFileContent());
         if ($successfullyWritten) {
             // Expose env vars of a possibly available .env file for following composer plugins
+            $this->loader->register();
             require $this->includeFile;
+            $this->loader->unregister();
         }
 
         return $successfullyWritten;

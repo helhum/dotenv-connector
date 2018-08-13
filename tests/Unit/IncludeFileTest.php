@@ -1,6 +1,7 @@
 <?php
 namespace Helhum\DotEnvConnector\Tests\Unit;
 
+use Composer\Autoload\ClassLoader;
 use Helhum\DotEnvConnector\Config;
 use Helhum\DotEnvConnector\IncludeFile;
 
@@ -22,8 +23,12 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $loaderProphecy = $this->prophesize(ClassLoader::class);
+        $loaderProphecy->register()->shouldBeCalled();
+        $loaderProphecy->unregister()->shouldBeCalled();
+
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
     }
@@ -35,8 +40,12 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $loaderProphecy = $this->prophesize(ClassLoader::class);
+        $loaderProphecy->register()->shouldBeCalled();
+        $loaderProphecy->unregister()->shouldBeCalled();
+
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
 
@@ -51,8 +60,12 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
         putenv('APP_ENV=1');
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $loaderProphecy = $this->prophesize(ClassLoader::class);
+        $loaderProphecy->register()->shouldBeCalled();
+        $loaderProphecy->unregister()->shouldBeCalled();
+
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
 
@@ -66,8 +79,12 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
+        $loaderProphecy = $this->prophesize(ClassLoader::class);
+        $loaderProphecy->register()->shouldBeCalled();
+        $loaderProphecy->unregister()->shouldBeCalled();
+
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
 
@@ -81,9 +98,13 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
+        $loaderProphecy = $this->prophesize(ClassLoader::class);
+        $loaderProphecy->register()->shouldNotBeCalled();
+        $loaderProphecy->unregister()->shouldNotBeCalled();
+
         mkdir(__DIR__ . '/Fixtures/foo', 000);
         $includeFilePath = __DIR__ . '/Fixtures/foo/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
         $this->assertFalse($includeFile->dump());
     }
 }
