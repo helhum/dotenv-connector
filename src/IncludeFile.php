@@ -43,8 +43,14 @@ class IncludeFile
      */
     private $filesystem;
 
-    public function __construct(Config $config, ClassLoader $loader, $includeFile, $includeFileTemplate = '', Filesystem $filesystem = null)
+    public function __construct(Config $config, $loader, $includeFile = '', $includeFileTemplate = '', Filesystem $filesystem = null)
     {
+        if (!$loader instanceof ClassLoader) {
+            // We're called by a previous version of the plugin
+            $includeFileTemplate = $includeFile;
+            $includeFile = $loader;
+            $loader = new ClassLoader();
+        }
         $this->config = $config;
         $this->loader = $loader;
         $this->includeFile = $includeFile;

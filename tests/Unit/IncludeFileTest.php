@@ -9,11 +9,17 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
 {
     protected function tearDown()
     {
-        @unlink(__DIR__ . '/Fixtures/vendor/helhum/include.php');
+        if (file_exists(__DIR__ . '/Fixtures/vendor/helhum/include.php')) {
+            unlink(__DIR__ . '/Fixtures/vendor/helhum/include.php');
+            rmdir(__DIR__ . '/Fixtures/vendor/helhum');
+            rmdir(__DIR__ . '/Fixtures/vendor');
+        }
         putenv('FOO');
         putenv('APP_ENV');
-        @chmod(__DIR__ . '/Fixtures/foo', 777);
-        @rmdir(__DIR__ . '/Fixtures/foo');
+        if (file_exists(__DIR__ . '/Fixtures/foo')) {
+            chmod(__DIR__ . '/Fixtures/foo', 777);
+            rmdir(__DIR__ . '/Fixtures/foo');
+        }
     }
 
     /**
@@ -106,5 +112,18 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
         $includeFilePath = __DIR__ . '/Fixtures/foo/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
         $this->assertFalse($includeFile->dump());
+    }
+
+    /**
+     * @test
+     */
+    public function creatingTheObjectAndDumpingWorksWithLegacyPlugin()
+    {
+        $configProphecy = $this->prophesize(Config::class);
+        $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
+
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
+        $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
+        $this->assertTrue($includeFile->dump());
     }
 }
