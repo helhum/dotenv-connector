@@ -45,7 +45,9 @@ You can specify a relative path from the base directory, if you want to put your
 
 *The default value* is ".env", which means next to your root `composer.json`.
 
-
+##### Special for TYPO3 installToolPassword provided via .env
+You must at least quote the installToolPassword in the `.env` file with single ticks, no double quote because of the "="-sign in the hash.
+So use `my_value='foobar'` instead of `my_value="foobar"`. If you do not, you can not login to installToll in standalone mode when using argon, which you want to use.
 
 ## Feedback
 
