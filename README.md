@@ -45,9 +45,8 @@ You can specify a relative path from the base directory, if you want to put your
 
 *The default value* is ".env", which means next to your root `composer.json`.
 
-##### Special for TYPO3 installToolPassword provided via .env
-You must at least quote the installToolPassword in the `.env` file with single ticks, no double quote because of the "="-sign in the hash.
-So use `my_value='foobar'` instead of `my_value="foobar"`. If you do not, you can not login to installToll in standalone mode when using argon, which you want to use.
+##### Side note for quoting values in the `.env` file
+As the `.env` fiel parsing behaves like if it was included in a shell, you have to be aware of that values with literal `$` signs need to be enclosed in single quotes. This may be the case if you use argon hashed values in credetentials you pass via `.env`.
 
 ## Feedback
 
