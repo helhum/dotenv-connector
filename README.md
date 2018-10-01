@@ -46,7 +46,7 @@ You can specify a relative path from the base directory, if you want to put your
 *The default value* is ".env", which means next to your root `composer.json`.
 
 ##### Side note for quoting values in the `.env` file
-As the `.env` fiel parsing behaves like if it was included in a shell, you have to be aware of that values with literal `$` signs need to be enclosed in single quotes. This may be the case if you use argon hashed values in credetentials you pass via `.env`.
+As the `.env` file parsing behaves like if it was included in a shell, you have to be aware of that values with literal `$` signs need to be enclosed in single quotes. This may be the case if you use argon hashed values in credetentials you pass via `.env`, for example.
 
 ## Feedback
 
