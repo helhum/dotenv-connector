@@ -177,7 +177,7 @@ class Config
         if ($config === null) {
             $baseDir = realpath(substr($composerConfig->get('vendor-dir'), 0, -strlen($composerConfig->get('vendor-dir', self::RELATIVE_PATHS))));
             $localConfig = \Composer\Factory::getComposerFile();
-            $file = new \Composer\Json\JsonFile($localConfig, new \Composer\Util\RemoteFilesystem($io));
+            $file = new \Composer\Json\JsonFile($localConfig, null, $io);
 
             $config = new static($baseDir);
             $config->merge($file->read());
