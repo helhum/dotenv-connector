@@ -1,5 +1,5 @@
 {
-    "name": "helhum/dotenv-connector",
+    "name": "dfau/dotenv-connector",
     "type": "composer-plugin",
     "license": "MIT",
     "description": "Makes it possible to set environment variables for composer projects.",
