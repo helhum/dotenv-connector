@@ -89,6 +89,9 @@ class IncludeFile
         $includeFileContent = file_get_contents($this->includeFileTemplate);
         $includeFileContent = $this->replaceToken('env-file', $pathToEnvFileCode, $includeFileContent);
 
+        $loadMethod = "'{$this->config->get('load-method')}'";
+        $includeFileContent = $this->replaceToken('load-method', $loadMethod, $includeFileContent);
+
         return $includeFileContent;
     }
 
