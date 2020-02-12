@@ -19,6 +19,7 @@ class Config
      */
     public static $defaultConfig = [
         'env-file' => '.env',
+        'include-template-file' => '{$vendor-dir}/helhum/dotenv-connector/res/PHP/dotenv-include.php.tmpl',
     ];
 
     /**
@@ -72,7 +73,7 @@ class Config
         switch ($key) {
             case 'env-file':
                 $val = rtrim($this->process($this->config[$key], $flags), '/\\');
-                return ($flags & self::RELATIVE_PATHS == 1) ? $val : $this->realpath($val);
+                return ($flags & self::RELATIVE_PATHS === 1) ? $val : $this->realpath($val);
             default:
                 return $this->process($this->config[$key], $flags);
         }
@@ -175,12 +176,22 @@ class Config
     {
         static $config;
         if ($config === null) {
-            $baseDir = realpath(substr($composerConfig->get('vendor-dir'), 0, -strlen($composerConfig->get('vendor-dir', self::RELATIVE_PATHS))));
+            $vendorDir = $composerConfig->get('vendor-dir');
+            $baseDir = realpath(substr($vendorDir, 0, -strlen($composerConfig->get('vendor-dir', self::RELATIVE_PATHS))));
             $localConfig = \Composer\Factory::getComposerFile();
             $file = new \Composer\Json\JsonFile($localConfig, null, $io);
 
             $config = new static($baseDir);
             $config->merge($file->read());
+            $config->merge(
+                [
+                    'extra' => [
+                        'helhum/dotenv-connector' => [
+                            'vendor-dir' => $vendorDir,
+                        ],
+                    ],
+                ]
+            );
         }
         return $config;
     }
