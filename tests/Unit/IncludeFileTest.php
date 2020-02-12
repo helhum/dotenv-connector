@@ -29,6 +29,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
         $loaderProphecy = $this->prophesize(ClassLoader::class);
         $loaderProphecy->register()->shouldBeCalled();
         $loaderProphecy->unregister()->shouldBeCalled();
@@ -46,6 +47,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
         $loaderProphecy = $this->prophesize(ClassLoader::class);
         $loaderProphecy->register()->shouldBeCalled();
         $loaderProphecy->unregister()->shouldBeCalled();
@@ -66,6 +68,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
         putenv('APP_ENV=1');
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
         $loaderProphecy = $this->prophesize(ClassLoader::class);
         $loaderProphecy->register()->shouldBeCalled();
         $loaderProphecy->unregister()->shouldBeCalled();
@@ -85,6 +88,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
+        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
         $loaderProphecy = $this->prophesize(ClassLoader::class);
         $loaderProphecy->register()->shouldBeCalled();
         $loaderProphecy->unregister()->shouldBeCalled();
@@ -104,6 +108,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
+        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
         $loaderProphecy = $this->prophesize(ClassLoader::class);
         $loaderProphecy->register()->shouldNotBeCalled();
         $loaderProphecy->unregister()->shouldNotBeCalled();
@@ -112,18 +117,5 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
         $includeFilePath = __DIR__ . '/Fixtures/foo/include.php';
         $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
         $this->assertFalse($includeFile->dump());
-    }
-
-    /**
-     * @test
-     */
-    public function creatingTheObjectAndDumpingWorksWithLegacyPlugin()
-    {
-        $configProphecy = $this->prophesize(Config::class);
-        $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
-
-        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $includeFilePath);
-        $this->assertTrue($includeFile->dump());
     }
 }

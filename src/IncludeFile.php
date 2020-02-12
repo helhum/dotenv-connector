@@ -45,16 +45,10 @@ class IncludeFile
 
     public function __construct(Config $config, $loader, $includeFile = '', $includeFileTemplate = '', Filesystem $filesystem = null)
     {
-        if (!$loader instanceof ClassLoader) {
-            // We're called by a previous version of the plugin
-            $includeFileTemplate = $includeFile;
-            $includeFile = $loader;
-            $loader = new ClassLoader();
-        }
         $this->config = $config;
         $this->loader = $loader;
         $this->includeFile = $includeFile;
-        $this->includeFileTemplate = $includeFileTemplate ?: dirname(__DIR__) . '/res/PHP/dotenv-include.php.tmpl';
+        $this->includeFileTemplate = $includeFileTemplate ?: $config->get('include-template-file');
         $this->filesystem = $filesystem ?: new Filesystem();
     }
 
@@ -81,6 +75,9 @@ class IncludeFile
      */
     private function getIncludeFileContent()
     {
+        if (!file_exists($this->includeFileTemplate)) {
+            throw new \RuntimeException('Include file template defined for helhum/dotenv-connector does not exist!', 1581515568);
+        }
         $envFile = $this->config->get('env-file');
         $pathToEnvFileCode = $this->filesystem->findShortestPathCode(
             $this->includeFile,
