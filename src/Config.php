@@ -72,6 +72,7 @@ class Config
         }
         switch ($key) {
             case 'env-file':
+            case 'include-template-file':
                 $val = rtrim($this->process($this->config[$key], $flags), '/\\');
                 return ($flags & self::RELATIVE_PATHS === 1) ? $val : $this->realpath($val);
             default:

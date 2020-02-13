@@ -52,7 +52,7 @@ class IncludeFile
         $this->filesystem = $filesystem ?: new Filesystem();
     }
 
-    public function dump()
+    public function dump(): bool
     {
         $this->filesystem->ensureDirectoryExists(dirname($this->includeFile));
         $successfullyWritten = false !== @file_put_contents($this->includeFile, $this->getIncludeFileContent());
@@ -73,10 +73,15 @@ class IncludeFile
      * @throws \InvalidArgumentException
      * @return string
      */
-    private function getIncludeFileContent()
+    private function getIncludeFileContent(): string
     {
         if (!file_exists($this->includeFileTemplate)) {
-            throw new \RuntimeException('Include file template defined for helhum/dotenv-connector does not exist!', 1581515568);
+            if (!empty($this->includeFileTemplate)) {
+                throw new \RuntimeException('Include file template defined for helhum/dotenv-connector does not exist!', 1581515568);
+            }
+            // We get here when include file template is empty, which could be a misconfiguration, but more likely happens
+            // during plugin package upgrades. In this case we provide the default value for smoother upgrades.
+            $this->includeFileTemplate = __DIR__ . '/../res/PHP/dotenv-include.php.tmpl';
         }
         $envFile = $this->config->get('env-file');
         $pathToEnvFileCode = $this->filesystem->findShortestPathCode(
