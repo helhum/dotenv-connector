@@ -1,5 +1,7 @@
 # dotenv connector [![Build Status](https://travis-ci.org/helhum/dotenv-connector.svg?branch=master)](https://travis-ci.org/helhum/dotenv-connector)
 
+TRAVIS TEST
+
 This is a composer plugin, that makes environment
 variables from a .env file available for any composer based project,
 without the need to modify code in the project.
