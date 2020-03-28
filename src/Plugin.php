@@ -40,6 +40,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
     protected $config;
 
     /**
+     * @var bool
+     */
+    private $deactivated = false;
+
+    /**
+     * @var bool
+     */
+    private $uninstalled = false;
+
+    /**
      * Apply plugin modifications to composer
      *
      * @param Composer $composer
@@ -50,6 +60,16 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         $this->config = Config::load($io, $composer->getConfig());
         $this->composer = $composer;
         $this->io = $io;
+    }
+
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+        $this->deactivated = true;
+    }
+
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
+        $this->uninstalled = true;
     }
 
     /**
@@ -70,7 +90,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
      */
     public function onPreAutoloadDump()
     {
-        if (!class_exists(IncludeFile::class)) {
+        if ($this->deactivated || $this->uninstalled || !class_exists(IncludeFile::class)) {
             // Plugin package was removed
             return;
         }
