@@ -29,6 +29,9 @@
         "mikey179/vfsstream": "^1.6.0",
         "composer/semver": "^1.0 || 2.0.*@dev"
     },
+    "conflict": {
+        "symfony/dotenv": ">=5.1.0"
+    },
     "extra": {
         "class": "Helhum\\DotEnvConnector\\Plugin",
         "branch-alias": {
