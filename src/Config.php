@@ -10,16 +10,18 @@ namespace Helhum\DotEnvConnector;
  * file that was distributed with this source code.
  */
 
+use Helhum\DotEnvConnector\Adapter\SymfonyDotEnv;
+
 class Config
 {
-    const RELATIVE_PATHS = 1;
+    private const RELATIVE_PATHS = 1;
 
     /**
      * @var array
      */
     public static $defaultConfig = [
         'env-file' => '.env',
-        'include-template-file' => '{$vendor-dir}/helhum/dotenv-connector/res/PHP/dotenv-include.php.tmpl',
+        'adapter' => SymfonyDotEnv::class,
     ];
 
     /**
@@ -71,8 +73,9 @@ class Config
             return null;
         }
         switch ($key) {
+            case 'adapter':
+                return $this->config[$key];
             case 'env-file':
-            case 'include-template-file':
                 $val = rtrim($this->process($this->config[$key], $flags), '/\\');
                 return ($flags & self::RELATIVE_PATHS === 1) ? $val : $this->realpath($val);
             default:

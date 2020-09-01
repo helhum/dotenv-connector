@@ -1,6 +1,0 @@
-<?php
-call_user_func(static function($dotEnvFile) {
-    if (file_exists($dotEnvFile)) {
-        (new \Symfony\Component\Dotenv\Dotenv(true))->loadEnv($dotEnvFile);
-    }
-}, '{$env-file}');

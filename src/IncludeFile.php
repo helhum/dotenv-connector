@@ -13,9 +13,12 @@ namespace Helhum\DotEnvConnector;
 use Composer\Autoload\ClassLoader;
 use Composer\Composer;
 use Composer\Util\Filesystem;
+use Helhum\DotEnvConnector\Adapter\SymfonyDotEnv;
 
 class IncludeFile
 {
+    private const defaultTemplate = __DIR__ . '/../res/PHP/dotenv-include.php.tmpl';
+
     /**
      * @var Config
      */
@@ -43,25 +46,25 @@ class IncludeFile
      */
     private $filesystem;
 
-    public function __construct(Config $config, $loader, $includeFile = '', $includeFileTemplate = '', Filesystem $filesystem = null)
+    public function __construct(Config $config, ClassLoader $loader, string $includeFile = '', string $includeFileTemplate = null, Filesystem $filesystem = null)
     {
         $this->config = $config;
         $this->loader = $loader;
         $this->includeFile = $includeFile;
-        $this->includeFileTemplate = $includeFileTemplate ?: $config->get('include-template-file');
+        $this->includeFileTemplate = $includeFileTemplate ?? self::defaultTemplate;
         $this->filesystem = $filesystem ?: new Filesystem();
     }
 
     public function dump(): bool
     {
+        $this->loader->register();
         $this->filesystem->ensureDirectoryExists(dirname($this->includeFile));
         $successfullyWritten = false !== @file_put_contents($this->includeFile, $this->getIncludeFileContent());
         if ($successfullyWritten) {
             // Expose env vars of a possibly available .env file for following composer plugins
-            $this->loader->register();
             require $this->includeFile;
-            $this->loader->unregister();
         }
+        $this->loader->unregister();
 
         return $successfullyWritten;
     }
@@ -75,21 +78,18 @@ class IncludeFile
      */
     private function getIncludeFileContent(): string
     {
-        if (!file_exists($this->includeFileTemplate)) {
-            if (!empty($this->includeFileTemplate)) {
-                throw new \RuntimeException('Include file template defined for helhum/dotenv-connector does not exist!', 1581515568);
-            }
-            // We get here when include file template is empty, which could be a misconfiguration, but more likely happens
-            // during plugin package upgrades. In this case we provide the default value for smoother upgrades.
-            $this->includeFileTemplate = __DIR__ . '/../res/PHP/dotenv-include.php.tmpl';
-        }
         $envFile = $this->config->get('env-file');
+        $adapterClass = $this->config->get('adapter') ?: SymfonyDotEnv::class;
+        if (!in_array(DotEnvVars::class ,class_implements($adapterClass), true)) {
+            throw new \RuntimeException(sprintf('Adapter "%s" does not implement DotEnvVars interface', $adapterClass), 1598957197);
+        }
         $pathToEnvFileCode = $this->filesystem->findShortestPathCode(
             $this->includeFile,
             $envFile
         );
         $includeFileContent = file_get_contents($this->includeFileTemplate);
         $includeFileContent = $this->replaceToken('env-file', $pathToEnvFileCode, $includeFileContent);
+        $includeFileContent = $this->replaceToken('adapter', '\\' . $adapterClass . '::class', $includeFileContent);
 
         return $includeFileContent;
     }

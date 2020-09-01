@@ -2,6 +2,7 @@
 namespace Helhum\DotEnvConnector\Tests\Unit;
 
 use Composer\Autoload\ClassLoader;
+use Helhum\DotEnvConnector\Adapter\SymfonyDotEnv;
 use Helhum\DotEnvConnector\Config;
 use Helhum\DotEnvConnector\IncludeFile;
 
@@ -29,7 +30,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
-        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
+        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
         $loaderProphecy = $this->prophesize(ClassLoader::class);
         $loaderProphecy->register()->shouldBeCalled();
         $loaderProphecy->unregister()->shouldBeCalled();
@@ -47,7 +48,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
-        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
+        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
         $loaderProphecy = $this->prophesize(ClassLoader::class);
         $loaderProphecy->register()->shouldBeCalled();
         $loaderProphecy->unregister()->shouldBeCalled();
@@ -68,7 +69,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
         putenv('APP_ENV=1');
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
-        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
+        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
         $loaderProphecy = $this->prophesize(ClassLoader::class);
         $loaderProphecy->register()->shouldBeCalled();
         $loaderProphecy->unregister()->shouldBeCalled();
@@ -88,7 +89,7 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
-        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
+        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
         $loaderProphecy = $this->prophesize(ClassLoader::class);
         $loaderProphecy->register()->shouldBeCalled();
         $loaderProphecy->unregister()->shouldBeCalled();
@@ -108,10 +109,10 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     {
         $configProphecy = $this->prophesize(Config::class);
         $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
-        $configProphecy->get('include-template-file')->willReturn(__DIR__ . '/../../res/PHP/dotenv-include.php.tmpl');
+        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
         $loaderProphecy = $this->prophesize(ClassLoader::class);
-        $loaderProphecy->register()->shouldNotBeCalled();
-        $loaderProphecy->unregister()->shouldNotBeCalled();
+        $loaderProphecy->register()->shouldBeCalled();
+        $loaderProphecy->unregister()->shouldBeCalled();
 
         mkdir(__DIR__ . '/Fixtures/foo', 000);
         $includeFilePath = __DIR__ . '/Fixtures/foo/include.php';

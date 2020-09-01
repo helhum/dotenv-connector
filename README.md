@@ -36,7 +36,7 @@ You configure dotenv connector in the extra section of the root `composer.json` 
   "extra": {
       "helhum/dotenv-connector": {
           "env-file": ".env",
-          "include-template-file": "{$vendor-dir}/helhum/dotenv-connector/res/PHP/dotenv-include.php.tmpl"
+          "adapter": "Helhum\\DotEnvConnector\\Adapter\\SymfonyDotEnv"
       }
     }
 ```
@@ -52,17 +52,17 @@ you have to be aware of that values with literal `$` signs
 need to be enclosed in single quotes.
 This may be the case if you use hashed values of credentials you pass via `.env`, for example.
 
-#### `include-template-file`
-You can specify a relative path from the base directory,
-if you need a different template for the to be created include file.
+#### `adapter`
+You can specify a class that implements `\Helhum\DotEnvConnector\DotEnvVars` interface,
+if you need a different way to expose env vars.
 
-*The default value* is "{$vendor-dir}/helhum/dotenv-connector/res/PHP/dotenv-include.php.tmpl", which uses the
-default template, which uses symfony/dotenv default parsing of the one .env file.
-Change this option with great care and at your own risk.
+*The default value* is "Helhum\DotEnvConnector\Adapter\SymfonyDotEnv",
+which uses symfony/dotenv default parsing of the one .env file.
+
 This could be useful though e.g. if you prefer to use another dotenv parsing library to expose the variables defined in .env
 or you want to switch to another parsing strategy of the Symfony dotenv parsing. In the latter case use
-"{$vendor-dir}/helhum/dotenv-connector/res/PHP/dotenv-include-sf-loadenv.php.tmpl" as value for this option.
-Have a look at the existing template files for examples for your own files in case you need them.
+"Helhum\DotEnvConnector\Adapter\SymfonyLoadEnv" as value for this option.
+Have a look at the existing implementations for examples.
 
 ## Feedback
 

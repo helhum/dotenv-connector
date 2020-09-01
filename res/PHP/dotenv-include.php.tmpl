@@ -1,6 +1,5 @@
 <?php
 call_user_func(static function($dotEnvFile) {
-    if (!getenv('APP_ENV') && file_exists($dotEnvFile)) {
-        (new \Symfony\Component\Dotenv\Dotenv(true))->load($dotEnvFile);
-    }
+    $class = '{$adapter}';
+    (new $class())->exposeToEnvironment($dotEnvFile);
 }, '{$env-file}');
