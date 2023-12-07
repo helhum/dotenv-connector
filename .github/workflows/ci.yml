@@ -1,0 +1,46 @@
+name: CI
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3']
+    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: intl
+    - uses: michaelw90/PHP-Lint@master
+  phpunit:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      matrix:
+        operating-system: [ubuntu-latest]
+        php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3']
+    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
+        extensions: intl
+    - uses: php-actions/composer@v6
+      with:
+        php-version: ${{ matrix.php-versions }}
+    - uses: php-actions/phpunit@v3
+      with:
+        php-version: ${{ matrix.php-versions }}
+        bootstrap: vendor/autoload.php
+        log_junit: 1
+        testdox_text: 1
+        args: tests/Unit/
