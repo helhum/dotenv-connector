@@ -9,7 +9,7 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest]
         php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3']
-    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+    name: PHP Lint with ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
 
     steps:
     - uses: actions/checkout@v4
@@ -24,8 +24,8 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest]
-        php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3']
-    name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
+        php-versions: ['8.1', '8.2', '8.3']
+    name: PHPUnit with ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
 
     steps:
     - uses: actions/checkout@v4
@@ -36,10 +36,10 @@ jobs:
         extensions: intl
     - uses: php-actions/composer@v6
       with:
-        php-version: ${{ matrix.php-versions }}
+        php_version: ${{ matrix.php-versions }}
     - uses: php-actions/phpunit@v3
       with:
-        php-version: ${{ matrix.php-versions }}
+        php_version: ${{ matrix.php-versions }}
         bootstrap: vendor/autoload.php
         log_junit: 1
         testdox_text: 1
