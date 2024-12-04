@@ -46,7 +46,7 @@ class IncludeFile
      */
     private $filesystem;
 
-    public function __construct(Config $config, ClassLoader $loader, string $includeFile = '', string $includeFileTemplate = null, Filesystem $filesystem = null)
+    public function __construct(Config $config, ClassLoader $loader, string $includeFile = '', ?string $includeFileTemplate = null, ?Filesystem $filesystem = null)
     {
         $this->config = $config;
         $this->loader = $loader;
