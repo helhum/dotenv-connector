@@ -11,6 +11,7 @@ namespace Helhum\DotEnvConnector;
  */
 
 use Composer\Autoload\ClassLoader;
+use Composer\Config;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
@@ -99,7 +100,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface
         if ($includeFile->dump()) {
             $rootPackage = $this->composer->getPackage();
             $autoloadDefinition = $rootPackage->getAutoload();
-            $autoloadDefinition['files'][] = $includeFilePath;
+            $autoloadDefinition['files'][] = $this->composer->getConfig()->get('vendor-dir', Config::RELATIVE_PATHS) . self::INCLUDE_FILE;
             $rootPackage->setAutoload($autoloadDefinition);
             $this->io->writeError('<info>helhum/dotenv-connector:</info> Generated dotenv include file');
         } else {
