@@ -56,12 +56,19 @@ This may be the case if you use hashed values of credentials you pass via `.env`
 You can specify a class that implements `\Helhum\DotEnvConnector\DotEnvVars` interface,
 if you need a different way to expose env vars.
 
-*The default value* is "Helhum\DotEnvConnector\Adapter\SymfonyDotEnv",
+*The default value* is `"Helhum\DotEnvConnector\Adapter\SymfonyDotEnv"`,
 which uses symfony/dotenv default parsing of the one .env file.
 
 This could be useful though e.g. if you prefer to use another dotenv parsing library to expose the variables defined in .env
 or you want to switch to another parsing strategy of the Symfony dotenv parsing. In the latter case use
-"Helhum\DotEnvConnector\Adapter\SymfonyLoadEnv" as value for this option.
+`"Helhum\DotEnvConnector\Adapter\SymfonyLoadEnv"` as value for this option.
+
+To additional support dumped .env settings, use the adapter `"\Helhum\DotEnvConnector\Adapter\SymfonyBootEnv"`.
+This allows to load a PHP file instead, compiled from all .env* files in the environment. 
+*Important*: The command `dump-env` needed for compiling the PHP file, is not registered by default.
+See the section [Configuring Environment Variables in Production](https://symfony.com/doc/current/configuration.html#configuring-environment-variables-in-production)
+of the symfony documentation for details.
+
 Have a look at the existing implementations for examples.
 
 ## Feedback
