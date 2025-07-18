@@ -53,15 +53,20 @@ need to be enclosed in single quotes.
 This may be the case if you use hashed values of credentials you pass via `.env`, for example.
 
 #### `adapter`
-You can specify a class that implements `\Helhum\DotEnvConnector\DotEnvVars` interface,
-if you need a different way to expose env vars.
+You can specify a class that implements the `\Helhum\DotEnvConnector\DotEnvVars` interface if you need a different way
+to expose environment variables. This package ships with three adapters for the `symfony/dotenv` component.
 
-*The default value* is "Helhum\DotEnvConnector\Adapter\SymfonyDotEnv",
-which uses symfony/dotenv default parsing of the one .env file.
+* `Helhum\DotEnvConnector\Adapter\SymfonyDotEnv` (Default): Uses `$dotenv->load()`.
+  * This loads variables from your `.env` file but will not overwrite any existing environment variables.
+  * The loading is skipped if an `APP_ENV` environment variable is already set.
+* `Helhum\DotEnvConnector\Adapter\SymfonyOverload`: Uses `$dotenv->overload()`.
+  * This is similar to the default adapter, but it will overwrite any existing environment variables with the values from your `.env` file.
+  * The loading is also skipped if an [APP_ENV]() environment variable is already set.
+* `Helhum\DotEnvConnector\Adapter\SymfonyLoadEnv`: Uses `$dotenv->loadEnv()`.
+  * This adapter uses Symfony's more powerful loading mechanism, which can load multiple files (`.env`, `.env.local`, `.env.$APP_ENV.local`, etc.).
+  * It does not check for the existence of `APP_ENV` before running.
 
-This could be useful though e.g. if you prefer to use another dotenv parsing library to expose the variables defined in .env
-or you want to switch to another parsing strategy of the Symfony dotenv parsing. In the latter case use
-"Helhum\DotEnvConnector\Adapter\SymfonyLoadEnv" as value for this option.
+You can also provide your own implementation if you want to use a different dotenv library.
 Have a look at the existing implementations for examples.
 
 ## Feedback
