@@ -136,4 +136,47 @@ class IncludeFileTest extends TestCase
         $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
         $this->assertFalse($includeFile->dump());
     }
+
+    /**
+     * @test
+     */
+    public function includingFileDoesNotOverrideExistingEnvVars()
+    {
+        putenv('FOO=baz');
+        $configProphecy = $this->prophesize(Config::class);
+        $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
+        $loaderProphecy = $this->prophesize(ClassLoader::class);
+        $loaderProphecy->register()->shouldBeCalled();
+        $loaderProphecy->unregister()->shouldBeCalled();
+
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
+        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
+        $includeFile->dump();
+        $this->assertTrue(file_exists($includeFilePath));
+
+        $this->assertSame('baz', getenv('FOO'));
+    }
+
+    /**
+     * @test
+     */
+    public function includingFileDoesOverrideExistingEnvVars()
+    {
+        putenv('FOO=baz');
+        putenv('DOTENV_CONNECTOR_OVERRIDE=1');
+        $configProphecy = $this->prophesize(Config::class);
+        $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
+        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
+        $loaderProphecy = $this->prophesize(ClassLoader::class);
+        $loaderProphecy->register()->shouldBeCalled();
+        $loaderProphecy->unregister()->shouldBeCalled();
+
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
+        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
+        $includeFile->dump();
+        $this->assertTrue(file_exists($includeFilePath));
+
+        $this->assertSame('bar', getenv('FOO'));
+    }
 }

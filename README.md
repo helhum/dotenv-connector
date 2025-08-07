@@ -25,6 +25,8 @@ to do so and also set `APP_ENV` and use the variables that are directly exposed 
 However for smaller scale projects it is still a valid and easy solution to use a `.env` file
 also for production environments.
 
+You can set the environment variable `DOTENV_CONNECTOR_OVERRIDE` to enable overriding of existing environment variables with the values of the `.env` file.
+
 ## configuration options
 
 Usually you don't need any configuration options. However if you need to, you can
