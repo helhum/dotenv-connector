@@ -1,0 +1,73 @@
+name: ✏️ matrix
+
+env:
+    OS: |
+        "ubuntu-latest"
+    PHP: |
+        "7.4"
+        "8.0"
+        "8.1"
+        "8.2"
+        "8.4"
+        "8.3"
+    EXCLUDE: |
+        {
+        }
+on:
+    workflow_call:
+        outputs:
+            os:
+                value: ${{ jobs.compute.outputs.os }}
+            os-single:
+                value: ${{ jobs.compute.outputs.os-single }}
+            php:
+                value: ${{ jobs.compute.outputs.php }}
+            php-single:
+                value: ${{ jobs.compute.outputs.php-single }}
+            exclude:
+                value: ${{ jobs.compute.outputs.exclude }}
+
+jobs:
+    compute:
+        name: Compute outputs
+
+        outputs:
+            os: ${{ steps.build-matrix.outputs.os }}
+            os-single: ${{ steps.build-matrix.outputs.os-single }}
+            php: ${{ steps.build-matrix.outputs.php }}
+            php-single: ${{ steps.build-matrix.outputs.php-single }}
+            exclude: ${{ steps.build-matrix.outputs.exclude }}
+
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Build matrix
+                id: build-matrix
+                run: |
+                    echo ""
+                    echo "::group::OS"
+                    os=$(echo $OS | jq --compact-output --raw-input --raw-output '.' | jq --compact-output --slurp '.')
+                    echo "os = $os"
+                    echo "os=$os" >> "$GITHUB_OUTPUT" 
+                    echo "os-single = $(echo $os | jq '.'[0])"
+                    echo "os-single=$(echo $os | jq '.'[0])" >> "$GITHUB_OUTPUT" 
+                    echo "::endgroup::"
+                    
+                    echo ""
+                    echo "::group::PHP"
+                    php=$(echo $PHP | jq --compact-output --raw-input --raw-output '.' | jq --compact-output --slurp '.')
+                    echo "php = $php"
+                    echo "php=$php" >> "$GITHUB_OUTPUT" 
+                    echo "php-single = $(echo $php | jq '.'[-1])"
+                    echo "php-single=$(echo $php | jq '.'[-1])" >> "$GITHUB_OUTPUT"
+                    echo "::endgroup::"
+
+                    echo ""
+                    echo "::group::EXCLUDE"
+                    exclude=$(cat <<EOF | jq -nc -f /dev/stdin | jq -c 'to_entries | map_values(.value)'
+                        $EXCLUDE
+                    EOF
+                    )
+                    echo "exclude = $exclude"
+                    echo "exclude=$exclude)" >> "$GITHUB_OUTPUT"
+                    echo "::endgroup::"

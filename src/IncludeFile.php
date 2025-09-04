@@ -80,7 +80,7 @@ class IncludeFile
     {
         $envFile = $this->config->get('env-file');
         $adapterClass = $this->config->get('adapter') ?: SymfonyDotEnv::class;
-        if (!in_array(DotEnvVars::class ,class_implements($adapterClass), true)) {
+        if (!in_array(DotEnvVars::class, class_implements($adapterClass), true)) {
             throw new \RuntimeException(sprintf('Adapter "%s" does not implement DotEnvVars interface', $adapterClass), 1598957197);
         }
         $pathToEnvFileCode = $this->filesystem->findShortestPathCode(

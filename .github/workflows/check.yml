@@ -1,0 +1,182 @@
+name: 🔎 code quality
+
+on:
+    pull_request:
+    push:
+        branches:
+            - main
+
+jobs:
+    compute:
+        uses: ./.github/workflows/compute.yml
+
+    lint:
+        name: 'Lint PHP ${{ matrix.php }}'
+
+        needs: [ compute ]
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os: ${{ fromJson(needs.compute.outputs.os) }}
+                php: ${{ fromJson(needs.compute.outputs.php) }}
+
+        runs-on: ${{ matrix.os }}
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Store Composer cache directory
+                id: composer-cache
+                run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            -   uses: actions/cache/restore@v4
+                id: restore-composer-cache
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ runner.os }}-composer-check-lint-${{ matrix.php }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-check-lint-
+                        ${{ runner.os }}-composer-check-
+                        ${{ runner.os }}-composer-
+
+            -   name: Set up PHP Version ${{ matrix.php }}
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ matrix.php }}
+                    extensions: xdebug, mbstring, posix
+                    tools: composer:v2
+
+            -   name: Environment Check
+                run: |
+                    php -v
+                    php -m
+                    composer --version
+
+            -   name: Validate composer.json
+                run: composer validate
+
+            -   name: Composer install
+                run: composer update --no-interaction
+
+            -   name: Save composer cache
+                uses: actions/cache/save@v4
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ steps.restore-composer-cache.outputs.cache-primary-key }}
+
+            -   name: Lint PHP
+                run: php vendor/bin/parallel-lint --exclude .git --exclude var --exclude vendor .
+
+
+    test:
+        name: PHPUnit tests ${{ matrix.php }}
+
+        needs: [ compute, lint ]
+
+        strategy:
+            fail-fast: false
+            matrix:
+                php: ${{ fromJson(needs.compute.outputs.php) }}
+
+        env:
+            php: ${{ matrix.php }}
+
+        runs-on: ${{ fromJson(needs.compute.outputs.os-single) }}
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Store Composer cache directory
+                id: composer-cache
+                run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            -   uses: actions/cache/restore@v4
+                id: restore-composer-cache
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ runner.os }}-composer-check-analyse-${{ env.php }}-${{ matrix.typo3 }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-check-analyse-
+                        ${{ runner.os }}-composer-check-
+                        ${{ runner.os }}-composer-
+
+            -   name: Set up PHP Version ${{ env.php }}
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ env.php }}
+                    extensions: xdebug, mbstring, posix
+                    tools: composer:v2
+
+            -   name: Environment Check
+                run: |
+                    php -v
+                    php -m
+                    composer --version
+
+            -   name: Composer install
+                run: composer update --no-interaction
+
+            -   name: Save composer cache
+                uses: actions/cache/save@v4
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ steps.restore-composer-cache.outputs.cache-primary-key }}
+
+            -   name: Run PHPStan
+                run: php vendor/bin/phpunit tests/Unit
+
+    fix:
+        name: PHP CS Fixer
+
+        needs: [ compute, lint ]
+
+        env:
+            php: ${{ fromJson(needs.compute.outputs.php-single) }}
+
+        runs-on: ${{ fromJson(needs.compute.outputs.os-single) }}
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v4
+
+            -   name: Store Composer cache directory
+                id: composer-cache
+                run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            -   uses: actions/cache/restore@v4
+                id: restore-composer-cache
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ runner.os }}-composer-check-fix-${{ env.php }}
+                    restore-keys: |
+                        ${{ runner.os }}-composer-check-fix-
+                        ${{ runner.os }}-composer-check-
+                        ${{ runner.os }}-composer-
+
+            -   name: Set up PHP Version ${{ env.php }}
+                uses: shivammathur/setup-php@v2
+                with:
+                    php-version: ${{ env.php }}
+                    extensions: xdebug, mbstring, posix
+                    tools: composer:v2
+
+            -   name: Environment Check
+                run: |
+                    php -v
+                    php -m
+                    composer --version
+
+            -   name: Composer install
+                run: composer update --no-interaction
+
+            -   name: Save composer cache
+                uses: actions/cache/save@v4
+                with:
+                    path: ${{ steps.composer-cache.outputs.dir }}
+                    key: ${{ steps.restore-composer-cache.outputs.cache-primary-key }}
+
+            -   name: Run PHP CS Fixer
+                run: php vendor/bin/php-cs-fixer check --diff --no-interaction --show-progress=none

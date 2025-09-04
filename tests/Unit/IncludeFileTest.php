@@ -5,10 +5,12 @@ use Composer\Autoload\ClassLoader;
 use Helhum\DotEnvConnector\Adapter\SymfonyDotEnv;
 use Helhum\DotEnvConnector\Config;
 use Helhum\DotEnvConnector\IncludeFile;
+use PHPUnit\Framework\TestCase;
+use Prophecy\Prophet;
 
-class IncludeFileTest extends \PHPUnit_Framework_TestCase
+class IncludeFileTest extends TestCase
 {
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if (file_exists(__DIR__ . '/Fixtures/vendor/helhum/include.php')) {
             unlink(__DIR__ . '/Fixtures/vendor/helhum/include.php');
@@ -28,15 +30,18 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
      */
     public function dumpDumpsFile()
     {
-        $configProphecy = $this->prophesize(Config::class);
-        $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
-        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
-        $loaderProphecy = $this->prophesize(ClassLoader::class);
-        $loaderProphecy->register()->shouldBeCalled();
-        $loaderProphecy->unregister()->shouldBeCalled();
+        $config = new Config();
+        $config->merge(['extra' => ['helhum/dotenv-connector' => [
+            'env-file' => __DIR__ . '/Fixtures/env/.env',
+            'adapter' => SymfonyDotEnv::class
+        ]]]);
+        /** @var ClassLoader|\PHPUnit\Framework\MockObject\MockObject $loaderMock */
+        $loaderMock = $this->createMock(ClassLoader::class);
+        $loaderMock->expects($this->once())->method('register');
+        $loaderMock->expects($this->once())->method('unregister');
 
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
     }
@@ -46,15 +51,18 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
      */
     public function includingFileExposesEnvVars()
     {
-        $configProphecy = $this->prophesize(Config::class);
-        $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
-        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
-        $loaderProphecy = $this->prophesize(ClassLoader::class);
-        $loaderProphecy->register()->shouldBeCalled();
-        $loaderProphecy->unregister()->shouldBeCalled();
+        $config = new Config();
+        $config->merge(['extra' => ['helhum/dotenv-connector' => [
+            'env-file' => __DIR__ . '/Fixtures/env/.env',
+            'adapter' => SymfonyDotEnv::class
+        ]]]);
+        /** @var ClassLoader|\PHPUnit\Framework\MockObject\MockObject $loaderMock */
+        $loaderMock = $this->createMock(ClassLoader::class);
+        $loaderMock->expects($this->once())->method('register');
+        $loaderMock->expects($this->once())->method('unregister');
 
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
 
@@ -67,15 +75,18 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
     public function includingFileDoesNothingIfEnvVarSet()
     {
         putenv('APP_ENV=1');
-        $configProphecy = $this->prophesize(Config::class);
-        $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.env');
-        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
-        $loaderProphecy = $this->prophesize(ClassLoader::class);
-        $loaderProphecy->register()->shouldBeCalled();
-        $loaderProphecy->unregister()->shouldBeCalled();
+        $config = new Config();
+        $config->merge(['extra' => ['helhum/dotenv-connector' => [
+            'env-file' => __DIR__ . '/Fixtures/env/.env',
+            'adapter' => SymfonyDotEnv::class
+        ]]]);
+        /** @var ClassLoader|\PHPUnit\Framework\MockObject\MockObject $loaderMock */
+        $loaderMock = $this->createMock(ClassLoader::class);
+        $loaderMock->expects($this->once())->method('register');
+        $loaderMock->expects($this->once())->method('unregister');
 
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
 
@@ -87,15 +98,18 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
      */
     public function includingFileDoesNothingIfEnvFileDoesNotExist()
     {
-        $configProphecy = $this->prophesize(Config::class);
-        $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
-        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
-        $loaderProphecy = $this->prophesize(ClassLoader::class);
-        $loaderProphecy->register()->shouldBeCalled();
-        $loaderProphecy->unregister()->shouldBeCalled();
+        $config = new Config();
+        $config->merge(['extra' => ['helhum/dotenv-connector' => [
+            'env-file' => __DIR__ . '/Fixtures/env/.no-env',
+            'adapter' => SymfonyDotEnv::class
+        ]]]);
+        /** @var ClassLoader|\PHPUnit\Framework\MockObject\MockObject $loaderMock */
+        $loaderMock = $this->createMock(ClassLoader::class);
+        $loaderMock->expects($this->once())->method('register');
+        $loaderMock->expects($this->once())->method('unregister');
 
         $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
         $includeFile->dump();
         $this->assertTrue(file_exists($includeFilePath));
 
@@ -107,16 +121,19 @@ class IncludeFileTest extends \PHPUnit_Framework_TestCase
      */
     public function dumpReturnsFalseIfFileCannotBeWritten()
     {
-        $configProphecy = $this->prophesize(Config::class);
-        $configProphecy->get('env-file')->willReturn(__DIR__ . '/Fixtures/env/.no-env');
-        $configProphecy->get('adapter')->willReturn(SymfonyDotEnv::class);
-        $loaderProphecy = $this->prophesize(ClassLoader::class);
-        $loaderProphecy->register()->shouldBeCalled();
-        $loaderProphecy->unregister()->shouldBeCalled();
+        $config = new Config();
+        $config->merge(['extra' => ['helhum/dotenv-connector' => [
+            'env-file' => __DIR__ . '/Fixtures/env/.no-env',
+            'adapter' => SymfonyDotEnv::class
+        ]]]);
+        /** @var ClassLoader|\PHPUnit\Framework\MockObject\MockObject $loaderMock */
+        $loaderMock = $this->createMock(ClassLoader::class);
+        $loaderMock->expects($this->once())->method('register');
+        $loaderMock->expects($this->once())->method('unregister');
 
         mkdir(__DIR__ . '/Fixtures/foo', 000);
         $includeFilePath = __DIR__ . '/Fixtures/foo/include.php';
-        $includeFile = new IncludeFile($configProphecy->reveal(), $loaderProphecy->reveal(), $includeFilePath);
+        $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
         $this->assertFalse($includeFile->dump());
     }
 }

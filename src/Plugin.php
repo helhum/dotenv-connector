@@ -11,8 +11,8 @@ namespace Helhum\DotEnvConnector;
  */
 
 use Composer\Autoload\ClassLoader;
-use Composer\Config as ComposerConfig;
 use Composer\Composer;
+use Composer\Config as ComposerConfig;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
 use Composer\Plugin\PluginInterface;

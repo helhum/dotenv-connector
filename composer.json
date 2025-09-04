@@ -19,15 +19,17 @@
         }
     },
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.4",
         "composer-plugin-api": "^1.0 || ^2.0",
         "symfony/dotenv": "^5.1 || ^6.4 || ^7.0"
     },
     "require-dev": {
         "composer/composer": "^1.0 || ^2.0",
-        "phpunit/phpunit": "^5",
+        "phpunit/phpunit": "^8 || ^9",
         "mikey179/vfsstream": "^1.6.0",
-        "composer/semver": "^1.0 || ^2.0 || ^3.0"
+        "composer/semver": "^1.0 || ^2.0 || ^3.0",
+        "php-parallel-lint/php-parallel-lint": "^1.4",
+        "friendsofphp/php-cs-fixer": "^3.87"
     },
     "extra": {
         "class": "Helhum\\DotEnvConnector\\Plugin",
