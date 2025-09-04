@@ -13,7 +13,7 @@ class SymfonyLoadEnv implements DotEnvVars
         if (is_file($dotEnvFile) || is_file("$dotEnvFile.dist")) {
             $dotEnv = new Dotenv();
             $dotEnv->usePutenv();
-            $dotEnv->loadEnv($dotEnvFile);
+            $dotEnv->loadEnv($dotEnvFile, null, 'dev', ['test'], (bool)getenv('DOTENV_CONNECTOR_OVERRIDE'));
         }
     }
 }

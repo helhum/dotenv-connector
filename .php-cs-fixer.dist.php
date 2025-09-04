@@ -5,7 +5,9 @@ if (PHP_SAPI !== 'cli') {
 // Define in which folders to search and which folders to exclude
 // Exclude some directories that are excluded by Git anyways to speed up the sniffing
 $finder = PhpCsFixer\Finder::create()
-    ->in(__DIR__ . '/src/');
+    ->in(__DIR__ . '/src/')
+    ->in(__DIR__ . '/tests/')
+;
 
 $configFinder = PhpCsFixer\Finder::create()
     ->in(__DIR__)

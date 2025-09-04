@@ -13,7 +13,11 @@ class SymfonyDotEnv implements DotEnvVars
         if (!getenv('APP_ENV') && file_exists($dotEnvFile)) {
             $dotEnv = new Dotenv();
             $dotEnv->usePutenv();
-            $dotEnv->load($dotEnvFile);
+            if (getenv('DOTENV_CONNECTOR_OVERRIDE')) {
+                $dotEnv->overload($dotEnvFile);
+            } else {
+                $dotEnv->load($dotEnvFile);
+            }
         }
     }
 }
