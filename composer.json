@@ -21,7 +21,7 @@
     "require": {
         "php": ">=7.4",
         "composer-plugin-api": "^1.0 || ^2.0",
-        "symfony/dotenv": "^5.1 || ^6.4 || ^7.0"
+        "symfony/dotenv": "^5.1 || ^6.4 || ^7.0 || ^8.0"
     },
     "require-dev": {
         "composer/composer": "^1.0 || ^2.0",
