@@ -3,6 +3,7 @@ namespace Helhum\DotEnvConnector\Tests\Unit;
 
 use Composer\Autoload\ClassLoader;
 use Helhum\DotEnvConnector\Adapter\SymfonyDotEnv;
+use Helhum\DotEnvConnector\Adapter\SymfonyDotEnvLocal;
 use Helhum\DotEnvConnector\Config;
 use Helhum\DotEnvConnector\IncludeFile;
 use PHPUnit\Framework\TestCase;
@@ -17,10 +18,11 @@ class IncludeFileTest extends TestCase
             rmdir(__DIR__ . '/Fixtures/vendor');
         }
         putenv('FOO');
+        putenv('LOCAL_ONLY');
         putenv('APP_ENV');
         putenv('DOTENV_CONNECTOR_OVERRIDE');
-        unset($_ENV['FOO'], $_ENV['APP_ENV'], $_ENV['DOTENV_CONNECTOR_OVERRIDE'], $_ENV['SYMFONY_DOTENV_VARS']);
-        unset($_SERVER['FOO'], $_SERVER['APP_ENV'], $_SERVER['DOTENV_CONNECTOR_OVERRIDE'], $_SERVER['SYMFONY_DOTENV_VARS']);
+        unset($_ENV['FOO'], $_ENV['LOCAL_ONLY'], $_ENV['APP_ENV'], $_ENV['DOTENV_CONNECTOR_OVERRIDE'], $_ENV['SYMFONY_DOTENV_VARS']);
+        unset($_SERVER['FOO'], $_SERVER['LOCAL_ONLY'], $_SERVER['APP_ENV'], $_SERVER['DOTENV_CONNECTOR_OVERRIDE'], $_SERVER['SYMFONY_DOTENV_VARS']);
         if (file_exists(__DIR__ . '/Fixtures/foo')) {
             chmod(__DIR__ . '/Fixtures/foo', 777);
             rmdir(__DIR__ . '/Fixtures/foo');
@@ -181,5 +183,77 @@ class IncludeFileTest extends TestCase
         $this->assertFileExists($includeFilePath);
 
         $this->assertSame('bar', getenv('FOO'));
+    }
+
+    /**
+     * @test
+     */
+    public function localAdapterLoadsLocalEnvOnTopOfEnv(): void
+    {
+        $config = new Config();
+        $config->merge(['extra' => ['helhum/dotenv-connector' => [
+            'env-file' => __DIR__ . '/Fixtures/env/.env',
+            'adapter' => SymfonyDotEnvLocal::class
+        ]]]);
+        $loaderMock = $this->createMock(ClassLoader::class);
+        $loaderMock->expects($this->once())->method('register');
+        $loaderMock->expects($this->once())->method('unregister');
+
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
+        $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
+        $includeFile->dump();
+        $this->assertFileExists($includeFilePath);
+
+        // .env defines FOO=bar; .env.local overrides it to "local" and adds LOCAL_ONLY
+        $this->assertSame('local', getenv('FOO'));
+        $this->assertSame('yes', getenv('LOCAL_ONLY'));
+    }
+
+    /**
+     * @test
+     */
+    public function localAdapterDoesNothingIfEnvVarSet(): void
+    {
+        putenv('APP_ENV=1');
+        $config = new Config();
+        $config->merge(['extra' => ['helhum/dotenv-connector' => [
+            'env-file' => __DIR__ . '/Fixtures/env/.env',
+            'adapter' => SymfonyDotEnvLocal::class
+        ]]]);
+        $loaderMock = $this->createMock(ClassLoader::class);
+        $loaderMock->expects($this->once())->method('register');
+        $loaderMock->expects($this->once())->method('unregister');
+
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
+        $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
+        $includeFile->dump();
+        $this->assertFileExists($includeFilePath);
+
+        $this->assertFalse(getenv('FOO'));
+        $this->assertFalse(getenv('LOCAL_ONLY'));
+    }
+
+    /**
+     * @test
+     */
+    public function defaultAdapterLoadsLocalEnvOnTopOfEnv(): void
+    {
+        $config = new Config();
+        // No 'adapter' configured -> the package default is used
+        $config->merge(['extra' => ['helhum/dotenv-connector' => [
+            'env-file' => __DIR__ . '/Fixtures/env/.env',
+        ]]]);
+        $loaderMock = $this->createMock(ClassLoader::class);
+        $loaderMock->expects($this->once())->method('register');
+        $loaderMock->expects($this->once())->method('unregister');
+
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
+        $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
+        $includeFile->dump();
+        $this->assertFileExists($includeFilePath);
+
+        // The default adapter is now SymfonyDotEnvLocal, so .env.local is loaded on top of .env
+        $this->assertSame('local', getenv('FOO'));
+        $this->assertSame('yes', getenv('LOCAL_ONLY'));
     }
 }
