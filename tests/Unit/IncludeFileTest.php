@@ -232,4 +232,28 @@ class IncludeFileTest extends TestCase
         $this->assertFalse(getenv('FOO'));
         $this->assertFalse(getenv('LOCAL_ONLY'));
     }
+
+    /**
+     * @test
+     */
+    public function defaultAdapterLoadsLocalEnvOnTopOfEnv(): void
+    {
+        $config = new Config();
+        // No 'adapter' configured -> the package default is used
+        $config->merge(['extra' => ['helhum/dotenv-connector' => [
+            'env-file' => __DIR__ . '/Fixtures/env/.env',
+        ]]]);
+        $loaderMock = $this->createMock(ClassLoader::class);
+        $loaderMock->expects($this->once())->method('register');
+        $loaderMock->expects($this->once())->method('unregister');
+
+        $includeFilePath = __DIR__ . '/Fixtures/vendor/helhum/include.php';
+        $includeFile = new IncludeFile($config, $loaderMock, $includeFilePath);
+        $includeFile->dump();
+        $this->assertFileExists($includeFilePath);
+
+        // The default adapter is now SymfonyDotEnvLocal, so .env.local is loaded on top of .env
+        $this->assertSame('local', getenv('FOO'));
+        $this->assertSame('yes', getenv('LOCAL_ONLY'));
+    }
 }

@@ -13,7 +13,7 @@ namespace Helhum\DotEnvConnector;
 use Composer\Autoload\ClassLoader;
 use Composer\Composer;
 use Composer\Util\Filesystem;
-use Helhum\DotEnvConnector\Adapter\SymfonyDotEnv;
+use Helhum\DotEnvConnector\Adapter\SymfonyDotEnvLocal;
 
 class IncludeFile
 {
@@ -79,7 +79,7 @@ class IncludeFile
     private function getIncludeFileContent(): string
     {
         $envFile = $this->config->get('env-file');
-        $adapterClass = $this->config->get('adapter') ?: SymfonyDotEnv::class;
+        $adapterClass = $this->config->get('adapter') ?: SymfonyDotEnvLocal::class;
         if (!in_array(DotEnvVars::class, class_implements($adapterClass), true)) {
             throw new \RuntimeException(sprintf('Adapter "%s" does not implement DotEnvVars interface', $adapterClass), 1598957197);
         }

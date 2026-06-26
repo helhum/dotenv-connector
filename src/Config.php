@@ -10,7 +10,7 @@ namespace Helhum\DotEnvConnector;
  * file that was distributed with this source code.
  */
 
-use Helhum\DotEnvConnector\Adapter\SymfonyDotEnv;
+use Helhum\DotEnvConnector\Adapter\SymfonyDotEnvLocal;
 
 class Config
 {
@@ -21,7 +21,7 @@ class Config
      */
     public static $defaultConfig = [
         'env-file' => '.env',
-        'adapter' => SymfonyDotEnv::class,
+        'adapter' => SymfonyDotEnvLocal::class,
     ];
 
     /**

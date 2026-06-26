@@ -38,7 +38,7 @@ You configure dotenv connector in the extra section of the root `composer.json` 
   "extra": {
       "helhum/dotenv-connector": {
           "env-file": ".env",
-          "adapter": "Helhum\\DotEnvConnector\\Adapter\\SymfonyDotEnv"
+          "adapter": "Helhum\\DotEnvConnector\\Adapter\\SymfonyDotEnvLocal"
       }
     }
 ```
@@ -58,24 +58,51 @@ This may be the case if you use hashed values of credentials you pass via `.env`
 You can specify a class that implements `\Helhum\DotEnvConnector\DotEnvVars` interface,
 if you need a different way to expose env vars.
 
-*The default value* is "Helhum\DotEnvConnector\Adapter\SymfonyDotEnv",
-which uses symfony/dotenv default parsing of the one .env file.
+*The default value* is "Helhum\DotEnvConnector\Adapter\SymfonyDotEnvLocal",
+which loads `.env` and then `.env.local` on top of it (see below).
 
-This could be useful though e.g. if you prefer to use another dotenv parsing library to expose the variables defined in .env
-or you want to switch to another parsing strategy of the Symfony dotenv parsing.
+> **Upgrading from 3.x:** the default adapter changed from `SymfonyDotEnv` (which loads a single
+> `.env` file) to `SymfonyDotEnvLocal` (which also loads `.env.local`). If a project has a
+> `.env.local` file, it is now loaded automatically. To keep the previous behaviour, explicitly set
+> the adapter to `Helhum\DotEnvConnector\Adapter\SymfonyDotEnv`.
 
-Bundled alternatives:
+You may set this to any class implementing the `DotEnvVars` interface if you prefer another parsing
+strategy or another dotenv parsing library.
 
-* `Helhum\DotEnvConnector\Adapter\SymfonyDotEnvLocal` — loads `.env` and then `.env.local`
-  on top of it, so shared defaults can live in `.env` (committed) and per-instance overrides in
-  `.env.local` (git-ignored). Values in `.env.local` override those from `.env`; neither overrides
-  variables already present in the real environment unless `DOTENV_CONNECTOR_OVERRIDE` is set. Like
-  the default, it does nothing when `APP_ENV` is set, and — unlike `SymfonyLoadEnv` — it does not load
-  per-environment files (`.env.$APP_ENV` etc.) and never writes `APP_ENV`. Use this when you want a
-  local override file but have no notion of an `APP_ENV` cascade (e.g. TYPO3 projects).
+Bundled adapters:
+
+* `Helhum\DotEnvConnector\Adapter\SymfonyDotEnvLocal` *(default)* — loads `.env` and then
+  `.env.local` on top of it, so shared defaults can live in `.env` (committed) and per-instance
+  overrides in `.env.local` (git-ignored). Values in `.env.local` override those from `.env`; neither
+  overrides variables already present in the real environment unless `DOTENV_CONNECTOR_OVERRIDE` is
+  set. It does nothing when `APP_ENV` is set, and — unlike `SymfonyLoadEnv` — it does not load
+  per-environment files (`.env.$APP_ENV` etc.) and never writes `APP_ENV`. This keeps the model to
+  exactly two files for projects (e.g. TYPO3) that have no notion of an `APP_ENV` cascade.
+* `Helhum\DotEnvConnector\Adapter\SymfonyDotEnv` — the previous default; loads a single `.env` file
+  only, using symfony/dotenv's default parsing. Set the adapter to this to restore 3.x behaviour.
 * `Helhum\DotEnvConnector\Adapter\SymfonyLoadEnv` — uses Symfony's `loadEnv()`, loading the full
   Symfony cascade: `.env`, `.env.local`, `.env.$APP_ENV` and `.env.$APP_ENV.local` (and a `.env.dist`
   fallback). `APP_ENV` selects which environment files are layered on and defaults to `dev`.
+
+##### Why `SymfonyDotEnvLocal` and not just `SymfonyLoadEnv`?
+
+`SymfonyLoadEnv` already loads `.env.local` — but only as one step of Symfony's full environment
+cascade, which is keyed on `APP_ENV`: it also pulls in `.env.$APP_ENV` / `.env.$APP_ENV.local`,
+defaults `APP_ENV` to `dev`, and writes that value back into the environment. That is the right
+behaviour inside a Symfony application, where `APP_ENV` is the central environment switch.
+
+Most consumers of this package, however, only want the simple "shared `.env`, overridden per
+instance by `.env.local`" pattern and have no `APP_ENV` notion at all — TYPO3, for instance, keys
+its environment off `TYPO3_CONTEXT` and never reads `APP_ENV`. For them the cascade is conceptual
+overhead with surprising side effects (a stray `.env.dev` suddenly contributing values, an
+unexpected `APP_ENV` appearing in the environment).
+
+`SymfonyDotEnvLocal` exists to cover exactly that two-file case and nothing more. Crucially it also
+preserves `APP_ENV`'s meaning *as it already works in this package* — a kill switch that skips
+dotenv parsing entirely (e.g. in production, where real environment variables are provided) — rather
+than repurposing `APP_ENV` as a file selector the way `loadEnv()` does. That made it a safe choice
+for the default: the common case works out of the box, while the only behavioural change from the
+previous default is that an existing `.env.local` is now loaded.
 
 Have a look at the existing implementations for examples.
 
