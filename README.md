@@ -62,8 +62,21 @@ if you need a different way to expose env vars.
 which uses symfony/dotenv default parsing of the one .env file.
 
 This could be useful though e.g. if you prefer to use another dotenv parsing library to expose the variables defined in .env
-or you want to switch to another parsing strategy of the Symfony dotenv parsing. In the latter case use
-"Helhum\DotEnvConnector\Adapter\SymfonyLoadEnv" as value for this option.
+or you want to switch to another parsing strategy of the Symfony dotenv parsing.
+
+Bundled alternatives:
+
+* `Helhum\DotEnvConnector\Adapter\SymfonyDotEnvLocal` — loads `.env` and then `.env.local`
+  on top of it, so shared defaults can live in `.env` (committed) and per-instance overrides in
+  `.env.local` (git-ignored). Values in `.env.local` override those from `.env`; neither overrides
+  variables already present in the real environment unless `DOTENV_CONNECTOR_OVERRIDE` is set. Like
+  the default, it does nothing when `APP_ENV` is set, and — unlike `SymfonyLoadEnv` — it does not load
+  per-environment files (`.env.$APP_ENV` etc.) and never writes `APP_ENV`. Use this when you want a
+  local override file but have no notion of an `APP_ENV` cascade (e.g. TYPO3 projects).
+* `Helhum\DotEnvConnector\Adapter\SymfonyLoadEnv` — uses Symfony's `loadEnv()`, loading the full
+  Symfony cascade: `.env`, `.env.local`, `.env.$APP_ENV` and `.env.$APP_ENV.local` (and a `.env.dist`
+  fallback). `APP_ENV` selects which environment files are layered on and defaults to `dev`.
+
 Have a look at the existing implementations for examples.
 
 ## Feedback
